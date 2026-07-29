@@ -878,6 +878,7 @@
       // so the UI/backend can stay in sync with what's actually active.
       reg.pushManager.getSubscription().then(function(sub) {
         pushSubscription = sub;
+        showBanner('DEBUG: service worker + push ready' + (sub ? ' (already subscribed)' : ' (not subscribed yet — tap the bell)'), 5000);
       });
     }).catch(function(err) {
       // Service worker failed to register (unsupported browser, non-HTTPS
