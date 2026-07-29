@@ -669,8 +669,8 @@
   //   VAPID_PUBLIC_KEY  -> the "public key" printed by `npx web-push generate-vapid-keys`
   // Until both are set, the app falls back to foreground-only notifications
   // (identical to the previous behaviour) and background push is simply skipped.
-  var PUSH_SERVER_URL = 'https://ebike-push.onrender.com/';
-  var VAPID_PUBLIC_KEY = 'BFlpISbtP6Hw9f9sHVVa3JxDE7n2hgoY2fY6C0vS0ILlW79duFbJcHryKg8wln2u_Y5mNhMwZwfpEH784hRIj0w';
+  var PUSH_SERVER_URL = '';
+  var VAPID_PUBLIC_KEY = '';
   var pushSubscription = null;
 
   var elSetHomeBtn = document.getElementById('set-home-btn');
@@ -867,9 +867,11 @@
       reg.pushManager.getSubscription().then(function(sub) {
         pushSubscription = sub;
       });
-    }).catch(function() {
+    }).catch(function(err) {
       // Service worker failed to register (unsupported browser, non-HTTPS
       // origin, etc). Foreground notifications still work without it.
+      console.error('[push-debug] service worker registration failed:', err);
+      showBanner('DEBUG: service worker failed — ' + err.message, 8000);
     });
   }
 
@@ -886,8 +888,27 @@
   // backend, telling it which location to watch stations from and when the
   // watch should stop. Safe to call even if push isn't configured/supported
   // — it just no-ops and the existing foreground-only path keeps working.
+  //
+  // DEBUG NOTE: this currently shows banners on every outcome (skip/success/
+  // failure) so setup issues are visible on the phone itself without a
+  // cable/Mac. Remove the showBanner calls once push is confirmed working.
   function subscribeToPush(expiresAt) {
-    if (!pushSupported() || !swRegistration || !userLoc) return Promise.resolve();
+    if (!PUSH_SERVER_URL || !VAPID_PUBLIC_KEY) {
+      showBanner('DEBUG: push not configured (PUSH_SERVER_URL/VAPID_PUBLIC_KEY blank in the deployed file)', 8000);
+      return Promise.resolve();
+    }
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      showBanner('DEBUG: this browser doesn\'t support push (needs installed PWA on iOS)', 8000);
+      return Promise.resolve();
+    }
+    if (!swRegistration) {
+      showBanner('DEBUG: no service worker registration yet — try reopening the app', 8000);
+      return Promise.resolve();
+    }
+    if (!userLoc) {
+      showBanner('DEBUG: no location yet, push subscribe skipped', 8000);
+      return Promise.resolve();
+    }
     return swRegistration.pushManager.getSubscription().then(function(existing) {
       var subPromise = existing ? Promise.resolve(existing) : swRegistration.pushManager.subscribe({
         userVisibleOnly: true,
@@ -905,11 +926,19 @@
             watchCount: NEAREST_WATCH_COUNT,
             expiresAt: expiresAt
           })
+        }).then(function(resp) {
+          if (!resp.ok) {
+            showBanner('DEBUG: backend rejected subscribe (HTTP ' + resp.status + ')', 8000);
+          } else {
+            showBanner('DEBUG: push subscription registered OK', 4000);
+          }
         });
       });
-    }).catch(function() {
+    }).catch(function(err) {
       // Push registration failed (offline, blocked, server unreachable) —
       // the local 25s poll loop below still covers the foreground case.
+      console.error('[push-debug] subscribeToPush failed:', err);
+      showBanner('DEBUG: push subscribe failed — ' + err.message, 8000);
     });
   }
 
