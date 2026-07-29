@@ -862,6 +862,18 @@
     if (!('serviceWorker' in navigator)) return;
     navigator.serviceWorker.register('./sw.js').then(function(reg) {
       swRegistration = reg;
+      if (!reg.pushManager) {
+        // This is the expected state on iOS when the page is running as a
+        // regular Safari tab rather than an installed Home Screen app —
+        // iOS only exposes pushManager in standalone mode. Not an error,
+        // just means push isn't available yet from here.
+        if (!isStandalone()) {
+          showBanner('DEBUG: push unavailable — open this from the Home Screen icon, not Safari', 8000);
+        } else {
+          showBanner('DEBUG: push unavailable in this browser (needs iOS 16.4+ / a browser with Web Push support)', 8000);
+        }
+        return;
+      }
       // Reconnect to an existing push subscription (e.g. after a reload)
       // so the UI/backend can stay in sync with what's actually active.
       reg.pushManager.getSubscription().then(function(sub) {
@@ -903,6 +915,12 @@
     }
     if (!swRegistration) {
       showBanner('DEBUG: no service worker registration yet — try reopening the app', 8000);
+      return Promise.resolve();
+    }
+    if (!swRegistration.pushManager) {
+      showBanner(isStandalone()
+        ? 'DEBUG: push unavailable in this browser (needs iOS 16.4+)'
+        : 'DEBUG: push unavailable — open this from the Home Screen icon, not Safari', 8000);
       return Promise.resolve();
     }
     if (!userLoc) {
