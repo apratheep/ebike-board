@@ -222,42 +222,6 @@ app.get('/api/health', function(req, res) {
   });
 });
 
-// DEBUG-ONLY: fires a real push to every currently-subscribed device on
-// demand, so you can confirm the whole background-delivery path (backend
-// -> push service -> service worker -> lock screen) without waiting for a
-// real e-bike availability change. Remove this route once verified —
-// it has no auth and anyone with the URL could spam your subscribers.
-app.get('/api/test-push', async function(req, res) {
-  const endpoints = Object.keys(subscriptions);
-  if (endpoints.length === 0) {
-    return res.json({ ok: false, message: 'No active subscriptions to send to.' });
-  }
-
-  const payload = JSON.stringify({
-    title: 'Test notification',
-    body: 'If you see this, background push is working.',
-    tag: 'ebike-test-' + Date.now()
-  });
-
-  let sent = 0;
-  let failed = 0;
-  for (const endpoint of endpoints) {
-    try {
-      await webpush.sendNotification(subscriptions[endpoint].subscription, payload);
-      sent++;
-    } catch (err) {
-      failed++;
-      if (err.statusCode === 404 || err.statusCode === 410) {
-        delete subscriptions[endpoint];
-      } else {
-        console.error('Test push failed for', endpoint.slice(-12), err.statusCode, err.body);
-      }
-    }
-  }
-  saveSubscriptions();
-  res.json({ ok: true, sent: sent, failed: failed, total: endpoints.length });
-});
-
 loadStationInfo()
   .then(startPolling)
   .catch(function(e) {
