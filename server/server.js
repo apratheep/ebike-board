@@ -147,7 +147,7 @@ async function expireSubscriptions() {
   if (expired.length === 0) return;
 
   const payload = JSON.stringify({
-    title: '\u{1F6B2}\u231B',
+    title: '\u231B',
     body: 'Time\u2019s up \u2014 you\u2019re no longer watching your nearest stations.',
     tag: 'ebike-watch-expired'
   });
@@ -176,8 +176,8 @@ async function notifySubscribers(flips) {
 
     for (const flip of relevant) {
       const payload = flip.type === 'available'
-        ? { title: '\u{1F6B2}\u2705', body: flip.name + ' now has ' + flip.ebikes + ' e-bike' + (flip.ebikes === 1 ? '' : 's') + ' available.', tag: 'ebike-available-' + flip.id }
-        : { title: '\u{1F6B2}\u274C', body: flip.name + ' is out of e-bikes.', tag: 'ebike-empty-' + flip.id };
+        ? { title: '\u{1F50B}', body: flip.name + ' now has ' + flip.ebikes + ' e-bike' + (flip.ebikes === 1 ? '' : 's') + ' available.', tag: 'ebike-available-' + flip.id }
+        : { title: '\u{1FAAB}', body: flip.name + ' is out of e-bikes.', tag: 'ebike-empty-' + flip.id };
 
       try {
         await webpush.sendNotification(sub.subscription, JSON.stringify(payload));
