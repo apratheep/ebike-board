@@ -1150,28 +1150,46 @@
     } catch (e) { userLoc = null; }
   }
 
-  function useMyLocation(cb) {
+  function useMyLocation(cb, opts) {
+    opts = opts || {};
+    var silent = !!opts.silent;
+    var maximumAge = typeof opts.maximumAge === 'number' ? opts.maximumAge : 60000;
+
     if (!navigator.geolocation) {
-      showBanner('Location isn\'t available in this browser.');
+      if (!silent) showBanner('Location isn\'t available in this browser.');
       return;
     }
-    var originalLabel = elNearestBtn.innerHTML;
-    elNearestBtn.textContent = 'Finding your location…';
-    elNearestBtn.disabled = true;
+
+    var originalLabel;
+    if (!silent) {
+      originalLabel = elNearestBtn.innerHTML;
+      elNearestBtn.textContent = 'Finding your location…';
+      elNearestBtn.disabled = true;
+    }
 
     navigator.geolocation.getCurrentPosition(function(pos) {
       userLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
       saveLocation();
-      elNearestBtn.innerHTML = originalLabel;
-      elNearestBtn.disabled = false;
+      if (!silent) {
+        elNearestBtn.innerHTML = originalLabel;
+        elNearestBtn.disabled = false;
+      }
       startBackgroundLocationWatch();
       render();
       if (cb) cb();
     }, function(err) {
-      elNearestBtn.innerHTML = originalLabel;
-      elNearestBtn.disabled = false;
-      showBanner('Couldn\'t get your location. Check Safari\'s location permission for this site and try again.', 8000);
-    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+      if (!silent) {
+        elNearestBtn.innerHTML = originalLabel;
+        elNearestBtn.disabled = false;
+        showBanner('Couldn\'t get your location. Check Safari\'s location permission for this site and try again.', 8000);
+        return;
+      }
+      // Silent (auto) refresh failed — keep whatever fix we already have
+      // (cached or none) and quietly fall back to the background watch so
+      // we still pick up a position later without bothering the person
+      // with an error on a launch they didn't even ask to trigger.
+      startBackgroundLocationWatch();
+    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: maximumAge });
   }
 
   var backgroundWatchId = null;
@@ -1491,8 +1509,17 @@
     await loadStationInfo();
     render();
     await refreshStatus();
-    if (!userLoc) {
-      useMyLocation();
+    if (!userLoc || isStandalone()) {
+      // A Home Screen launch is a fresh session in a possibly new place —
+      // trusting yesterday's cached lat/lon would sort the board around
+      // wherever the phone happened to be last time, not now. Refresh it
+      // silently; the render() above already showed the last-known fix
+      // (if any) so the board isn't empty while this resolves, and a
+      // failure here shouldn't surface an error the person never asked for.
+      // maximumAge: 0 also stops the OS from handing back its own recently
+      // cached fix — without it, a launch soon after backgrounding could
+      // still get a stale-ish position even though we bypassed our cache.
+      useMyLocation(null, { silent: true, maximumAge: 0 });
     } else {
       startBackgroundLocationWatch();
     }
