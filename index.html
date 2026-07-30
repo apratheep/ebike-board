@@ -126,14 +126,21 @@
   }
   #board-root .notify-header-btn {
     position: relative;
-    width: 26px;
-    height: 26px;
-    border: 1.5px solid currentColor;
+    width: 34px;
+    height: 34px;
+    border: 2px solid currentColor;
     border-radius: 50%;
     color: var(--board-green-dark);
     padding: 0;
     align-items: center;
     justify-content: center;
+  }
+  #board-root .notify-header-btn .loc-badge {
+    top: -3px;
+    right: -3px;
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid var(--board-green-header);
   }
   #board-root .sub { font-size: 13.5px; color: var(--board-green-dark); opacity: 0.82; margin-bottom: 16px; font-weight: 500; }
   #board-root .nearest-btn {
@@ -563,8 +570,8 @@
           <span class="enable-notify-dot"></span>
         </button>
         <button type="button" class="loc-icon-btn notify-header-btn" id="set-notify-btn" aria-label="Notify me when e-bikes are available" title="Notify me when e-bikes are available" style="display:none;">
-          <svg class="icon-filled" viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2a1 1 0 0 1 1 1v.1c3.4.46 6 3.4 6 6.9v4.3l1.6 2.4c.42.63-.03 1.4-.78 1.4H4.18c-.75 0-1.2-.77-.78-1.4L5 14.3V10c0-3.5 2.6-6.44 6-6.9V3a1 1 0 0 1 1-1z"/><circle cx="12" cy="20" r="1.6"/></svg>
-          <svg class="icon-outline" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0v3.5l1.5 2.5h-15l1.5-2.5V10z"/><path d="M9.5 18.5a2.5 2.5 0 0 0 5 0"/></svg>
+          <svg class="icon-filled" viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path d="M12 2a1 1 0 0 1 1 1v.1c3.4.46 6 3.4 6 6.9v4.3l1.6 2.4c.42.63-.03 1.4-.78 1.4H4.18c-.75 0-1.2-.77-.78-1.4L5 14.3V10c0-3.5 2.6-6.44 6-6.9V3a1 1 0 0 1 1-1z"/><circle cx="12" cy="20" r="1.6"/></svg>
+          <svg class="icon-outline" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0v3.5l1.5 2.5h-15l1.5-2.5V10z"/><path d="M9.5 18.5a2.5 2.5 0 0 0 5 0"/></svg>
           <span class="loc-badge"></span>
         </button>
         <button type="button" id="add-home-btn" class="add-home-btn" aria-label="Add to Home Screen" title="Add to Home Screen">
