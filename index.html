@@ -124,6 +124,17 @@
     background: var(--board-green-dark);
     z-index: 0;
   }
+  #board-root .notify-header-btn {
+    position: relative;
+    width: 26px;
+    height: 26px;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    color: var(--board-green-dark);
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+  }
   #board-root .sub { font-size: 13.5px; color: var(--board-green-dark); opacity: 0.82; margin-bottom: 16px; font-weight: 500; }
   #board-root .nearest-btn {
     width: 100%;
@@ -551,6 +562,11 @@
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0v3.5l1.5 2.5h-15l1.5-2.5V10z"/><path d="M9.5 18.5a2.5 2.5 0 0 0 5 0"/></svg>
           <span class="enable-notify-dot"></span>
         </button>
+        <button type="button" class="loc-icon-btn notify-header-btn" id="set-notify-btn" aria-label="Notify me when e-bikes are available" title="Notify me when e-bikes are available" style="display:none;">
+          <svg class="icon-filled" viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2a1 1 0 0 1 1 1v.1c3.4.46 6 3.4 6 6.9v4.3l1.6 2.4c.42.63-.03 1.4-.78 1.4H4.18c-.75 0-1.2-.77-.78-1.4L5 14.3V10c0-3.5 2.6-6.44 6-6.9V3a1 1 0 0 1 1-1z"/><circle cx="12" cy="20" r="1.6"/></svg>
+          <svg class="icon-outline" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0v3.5l1.5 2.5h-15l1.5-2.5V10z"/><path d="M9.5 18.5a2.5 2.5 0 0 0 5 0"/></svg>
+          <span class="loc-badge"></span>
+        </button>
         <button type="button" id="add-home-btn" class="add-home-btn" aria-label="Add to Home Screen" title="Add to Home Screen">
           <svg viewBox="0 0 32 24" width="30" height="23"><rect x="18" y="2" width="12" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="19.5" y="4" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="24.5" y="4" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="19.5" y="9" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="24.5" y="9" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="19.5" y="14" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="24.5" y="14" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="22" y="19" width="4" height="1.2" rx="0.6" fill="currentColor"/><path d="M2,10 L12,10 L12,6 L18,12 L12,18 L12,14 L2,14 Z" fill="currentColor"/></svg>
         </button>
@@ -576,11 +592,6 @@
           <button type="button" class="loc-icon-btn" id="set-work-btn" aria-label="Set work station">
             <svg class="icon-filled" viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M9 3.2a2 2 0 0 0-2 2v1H4.2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h15.6a2 2 0 0 0 2-2v-10a2 2 0 0 0-2-2H17v-1a2 2 0 0 0-2-2H9zm0 2h6v1H9v-1zM2.2 12h19.6v-1.8H2.2V12z"/></svg>
             <svg class="icon-outline" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            <span class="loc-badge"></span>
-          </button>
-          <button type="button" class="loc-icon-btn" id="set-notify-btn" aria-label="Notify me when e-bikes are available">
-            <svg class="icon-filled" viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M12 2a1 1 0 0 1 1 1v.1c3.4.46 6 3.4 6 6.9v4.3l1.6 2.4c.42.63-.03 1.4-.78 1.4H4.18c-.75 0-1.2-.77-.78-1.4L5 14.3V10c0-3.5 2.6-6.44 6-6.9V3a1 1 0 0 1 1-1z"/><circle cx="12" cy="20" r="1.6"/></svg>
-            <svg class="icon-outline" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0v3.5l1.5 2.5h-15l1.5-2.5V10z"/><path d="M9.5 18.5a2.5 2.5 0 0 0 5 0"/></svg>
             <span class="loc-badge"></span>
           </button>
         </span>
@@ -1106,13 +1117,27 @@
     deferredInstallPrompt = e;
   });
 
+  // The notify bell only works once running as an installed Home Screen
+  // app (push subscriptions require standalone mode on iOS), so it takes
+  // over the exact header slot the "Add to Home Screen" button uses —
+  // one prompts installing, the other manages notifications, and only one
+  // is ever relevant/visible at a time.
+  function updateStandaloneHeaderIcons() {
+    if (isStandalone()) {
+      elAddHomeBtn.style.display = 'none';
+      elSetNotifyBtn.style.display = 'flex';
+    } else {
+      elSetNotifyBtn.style.display = 'none';
+    }
+  }
+
   window.addEventListener('appinstalled', function() {
-    elAddHomeBtn.style.display = 'none';
+    updateStandaloneHeaderIcons();
   });
 
-  if (isStandalone()) {
-    elAddHomeBtn.style.display = 'none';
-  } else {
+  updateStandaloneHeaderIcons();
+
+  if (!isStandalone()) {
     elAddHomeBtn.addEventListener('click', function() {
       if (deferredInstallPrompt) {
         deferredInstallPrompt.prompt();
