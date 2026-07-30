@@ -1280,6 +1280,11 @@
 
   function maybeNotifyStation(st, prevEbikes) {
     if (!notificationsSupported() || Notification.permission !== 'granted') return;
+    // If we have an active push subscription, the backend's own poll loop
+    // will already send this exact notification (and it covers foreground,
+    // background, and locked states alike) — firing a second one here would
+    // just duplicate it. Only use this local path when push isn't set up.
+    if (pushSubscription) return;
     if (prevEbikes === 0 && st.ebikes > 0) {
       try {
         new Notification('E-bike available', {
