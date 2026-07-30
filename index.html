@@ -740,7 +740,7 @@
   function notifyWatchExpiredLocally() {
     if (!notificationsSupported() || Notification.permission !== 'granted') return;
     try {
-      new Notification('\u{1F6B2}\u231B', {
+      new Notification('\u231B', {
         body: 'Time\u2019s up \u2014 you\u2019re no longer watching your nearest stations.',
         tag: 'ebike-watch-expired'
       });
@@ -1277,14 +1277,14 @@
     if (pushSubscription) return;
     if (prevEbikes === 0 && st.ebikes > 0) {
       try {
-        new Notification('\u{1F6B2}\u2705', {
+        new Notification('\u{1F50B}', {
           body: st.name + ' now has ' + st.ebikes + ' e-bike' + (st.ebikes === 1 ? '' : 's') + ' available.',
           tag: 'ebike-available-' + st.id
         });
       } catch (e) {}
     } else if (prevEbikes !== null && prevEbikes > 0 && st.ebikes === 0) {
       try {
-        new Notification('\u{1F6B2}\u274C', {
+        new Notification('\u{1FAAB}', {
           body: st.name + ' is out of e-bikes.',
           tag: 'ebike-empty-' + st.id
         });
