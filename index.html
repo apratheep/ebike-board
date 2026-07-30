@@ -971,17 +971,21 @@
   function deniedNotificationInstructions() {
     var ua = navigator.userAgent || '';
     var isIOS = /iphone|ipad|ipod/i.test(ua);
+    var browserName = detectBrowserName();
 
     if (isIOS && isStandalone()) {
       return 'Notifications are blocked. Enable them: Settings → Notifications → E-bikes → Allow Notifications.';
     }
-    if (isIOS) {
+    if (isIOS && isActuallySafari()) {
       return 'Notifications are blocked. In Safari, tap the "aA" icon in the address bar → Website Settings → Notifications → Allow.';
     }
-    if (/android/i.test(ua)) {
-      return 'Notifications are blocked. Open your browser\'s site settings for this page and allow notifications.';
+    if (isIOS) {
+      return 'Notifications are blocked. Check ' + browserName + '\'s site settings for this page and allow notifications.';
     }
-    return 'Notifications are blocked for this site. Check your browser\'s notification settings to allow them.';
+    if (/android/i.test(ua)) {
+      return 'Notifications are blocked. Open ' + browserName + '\'s site settings for this page and allow notifications.';
+    }
+    return 'Notifications are blocked for this site. Check ' + browserName + '\'s notification settings to allow them.';
   }
 
   function updateEnableNotifyBtn() {
@@ -1123,6 +1127,31 @@
 
   elBannerClose.addEventListener('click', hideBanner);
 
+  // Detects the actual browser from the user agent so banners/instructions
+  // can name it correctly, rather than assuming Safari. Many iOS browsers
+  // (Chrome, Firefox, Edge, etc.) are WebKit wrappers whose UA strings still
+  // contain "Safari" for compatibility, so those need to be ruled out first.
+  function detectBrowserName() {
+    var ua = navigator.userAgent || '';
+    if (/EdgiOS|Edg\//i.test(ua)) return 'Edge';
+    if (/CriOS|Chrome/i.test(ua)) return 'Chrome';
+    if (/FxiOS|Firefox/i.test(ua)) return 'Firefox';
+    if (/OPiOS|OPR\//i.test(ua)) return 'Opera';
+    if (/SamsungBrowser/i.test(ua)) return 'Samsung Internet';
+    if (/DuckDuckGo/i.test(ua)) return 'DuckDuckGo';
+    if (/Safari/i.test(ua)) return 'Safari';
+    return 'your browser';
+  }
+
+  // True only for actual Safari — the browsers above also include "Safari"
+  // in their UA string for compatibility, so this checks specifically for
+  // the absence of any of their own tokens.
+  function isActuallySafari() {
+    var ua = navigator.userAgent || '';
+    return /Safari/i.test(ua) && /Version\//i.test(ua) &&
+      !/CriOS|FxiOS|EdgiOS|OPiOS|OPR\/|Edg\/|Chrome|SamsungBrowser|DuckDuckGo/i.test(ua);
+  }
+
   function isStandalone() {
     return window.navigator.standalone === true ||
       window.matchMedia('(display-mode: standalone)').matches;
@@ -1211,7 +1240,7 @@
     }, function(err) {
       elNearestBtn.innerHTML = originalLabel;
       elNearestBtn.disabled = false;
-      showBanner('Couldn\'t get your location. Check Safari\'s location permission for this site and try again.', 8000);
+      showBanner('Couldn\'t get your location. Check ' + detectBrowserName() + '\'s location permission for this site and try again.', 8000);
     }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
   }
 
