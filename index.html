@@ -70,17 +70,23 @@
     flex-shrink: 0;
   }
   #board-root .head-row {
+    position: relative;
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
     margin-bottom: 2px;
   }
   #board-root .head-icons {
+    position: absolute;
+    top: 0;
+    right: 0;
     display: flex;
     align-items: center;
     gap: 10px;
   }
   #board-root .title {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-right: 44px;
+    line-height: 1;
     font-size: 18px;
     letter-spacing: 0.03em;
     text-transform: uppercase;
