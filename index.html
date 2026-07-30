@@ -664,11 +664,6 @@
   var pendingNotifyDuration = DEFAULT_NOTIFY_DURATION;
 
   // --- Web Push config -------------------------------------------------
-  // Fill these in once the backend from /server is deployed:
-  //   PUSH_SERVER_URL   -> e.g. 'https://your-app.onrender.com'
-  //   VAPID_PUBLIC_KEY  -> the "public key" printed by `npx web-push generate-vapid-keys`
-  // Until both are set, the app falls back to foreground-only notifications
-  // (identical to the previous behaviour) and background push is simply skipped.
   var PUSH_SERVER_URL = 'https://ebike-push.onrender.com';
   var VAPID_PUBLIC_KEY = 'BMSAbYk1s0XU080LZH8BPLYZz9x3oya6S6fuS8kmqaqUmu_x2rU6RfDjj_NEoMGjVeuTQ6hSE7CPa0-0X5pNkgU';
   var pushSubscription = null;
@@ -730,12 +725,26 @@
 
   function expireStaleNotifyWatch() {
     if (notifyWatch && Date.now() >= notifyWatch.expiresAt) {
+      var hadPush = !!pushSubscription;
       notifyWatch = null;
       try { localStorage.removeItem(NOTIFY_KEY); } catch (e) {}
       unsubscribeFromPush();
+      // If we have (had) an active push subscription, the backend's own
+      // expiry check sends this same notification — avoid a duplicate.
+      if (!hadPush) notifyWatchExpiredLocally();
       return true;
     }
     return false;
+  }
+
+  function notifyWatchExpiredLocally() {
+    if (!notificationsSupported() || Notification.permission !== 'granted') return;
+    try {
+      new Notification('\u{1F6B2}\u231B', {
+        body: 'Time\u2019s up \u2014 you\u2019re no longer watching your nearest stations.',
+        tag: 'ebike-watch-expired'
+      });
+    } catch (e) {}
   }
 
   function checkNotifyExpiry() {
@@ -995,25 +1004,6 @@
     elNotifyModal.style.display = 'none';
   }
 
-  function stationsWithEbikesNow(ids) {
-    return ids.map(function(id) { return stationsById[id]; })
-      .filter(function(s) { return s && typeof s.ebikes === 'number' && s.ebikes > 0; });
-  }
-
-  function announceImmediateAvailability(ids) {
-    var available = stationsWithEbikesNow(ids);
-    if (available.length === 0) return;
-    var msg;
-    if (available.length === 1) {
-      var s = available[0];
-      msg = abbreviateName(s.name) + ' already has ' + s.ebikes + ' e-bike' + (s.ebikes === 1 ? '' : 's') + ' available.';
-    } else {
-      msg = available.length + ' nearby stations already have e-bikes: ' +
-        available.map(function(s) { return abbreviateName(s.name); }).join(', ') + '.';
-    }
-    showBanner(msg, 6000);
-  }
-
   function startNotifyWatch(minutes) {
     if (!userLoc) {
       showBanner('Set your location first so we know your nearest stations.', 4000);
@@ -1046,7 +1036,7 @@
   function requestNotifyPermissionAndStart(minutes) {
     if (Notification.permission === 'granted') {
       startNotifyWatch(minutes);
-      announceImmediateAvailability(nearestWatchIds());
+      closeNotifyModal();
       return;
     }
     if (Notification.permission === 'denied') {
@@ -1058,7 +1048,7 @@
       updateEnableNotifyBtn();
       if (perm === 'granted') {
         startNotifyWatch(minutes);
-        announceImmediateAvailability(nearestWatchIds());
+        closeNotifyModal();
       } else {
         closeNotifyModal();
         showBanner('Notifications need to be allowed to start watching.', 4000);
@@ -1287,14 +1277,14 @@
     if (pushSubscription) return;
     if (prevEbikes === 0 && st.ebikes > 0) {
       try {
-        new Notification('E-bike available', {
+        new Notification('\u{1F6B2}\u2705', {
           body: st.name + ' now has ' + st.ebikes + ' e-bike' + (st.ebikes === 1 ? '' : 's') + ' available.',
           tag: 'ebike-available-' + st.id
         });
       } catch (e) {}
     } else if (prevEbikes !== null && prevEbikes > 0 && st.ebikes === 0) {
       try {
-        new Notification('E-bikes gone', {
+        new Notification('\u{1F6B2}\u274C', {
           body: st.name + ' is out of e-bikes.',
           tag: 'ebike-empty-' + st.id
         });
