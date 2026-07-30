@@ -128,22 +128,47 @@ async function pollOnce() {
     prevEbikes[id] = ebikes;
   }
 
-  if (flips.length === 0) return;
-  await notifySubscribers(flips);
+  // Runs every cycle regardless of flips, since a watch can expire on a
+  // poll where nothing at the watched stations changed.
+  await expireSubscriptions();
+
+  if (flips.length > 0) await notifySubscribers(flips);
+}
+
+// Sends the "time's up" notification to any subscription whose watch
+// window has just ended, then removes it. Independent of availability
+// flips so it fires even on a poll cycle with no changes.
+async function expireSubscriptions() {
+  const now = Date.now();
+  const expired = Object.keys(subscriptions).filter(function(endpoint) {
+    const sub = subscriptions[endpoint];
+    return sub.expiresAt && now >= sub.expiresAt;
+  });
+  if (expired.length === 0) return;
+
+  const payload = JSON.stringify({
+    title: '\u{1F6B2}\u231B',
+    body: 'Time\u2019s up \u2014 you\u2019re no longer watching your nearest stations.',
+    tag: 'ebike-watch-expired'
+  });
+
+  for (const endpoint of expired) {
+    try {
+      await webpush.sendNotification(subscriptions[endpoint].subscription, payload);
+    } catch (err) {
+      // Subscription may already be dead on the browser's end — fine, we're
+      // removing it either way.
+    }
+    delete subscriptions[endpoint];
+  }
+  saveSubscriptions();
 }
 
 async function notifySubscribers(flips) {
-  const now = Date.now();
   let dirty = false;
 
   for (const endpoint of Object.keys(subscriptions)) {
     const sub = subscriptions[endpoint];
-
-    if (sub.expiresAt && now >= sub.expiresAt) {
-      delete subscriptions[endpoint];
-      dirty = true;
-      continue;
-    }
 
     const watchIds = nearestStationIds(sub.lat, sub.lon, sub.watchCount || 4);
     const relevant = flips.filter(function(f) { return watchIds.indexOf(f.id) !== -1; });
@@ -151,8 +176,8 @@ async function notifySubscribers(flips) {
 
     for (const flip of relevant) {
       const payload = flip.type === 'available'
-        ? { title: 'E-bike available', body: flip.name + ' now has ' + flip.ebikes + ' e-bike' + (flip.ebikes === 1 ? '' : 's') + ' available.', tag: 'ebike-available-' + flip.id }
-        : { title: 'E-bikes gone', body: flip.name + ' is out of e-bikes.', tag: 'ebike-empty-' + flip.id };
+        ? { title: '\u{1F6B2}\u2705', body: flip.name + ' now has ' + flip.ebikes + ' e-bike' + (flip.ebikes === 1 ? '' : 's') + ' available.', tag: 'ebike-available-' + flip.id }
+        : { title: '\u{1F6B2}\u274C', body: flip.name + ' is out of e-bikes.', tag: 'ebike-empty-' + flip.id };
 
       try {
         await webpush.sendNotification(sub.subscription, JSON.stringify(payload));
