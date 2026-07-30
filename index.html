@@ -740,7 +740,7 @@
   function notifyWatchExpiredLocally() {
     if (!notificationsSupported() || Notification.permission !== 'granted') return;
     try {
-      new Notification('\u231B', {
+      new Notification('\u{1F6B2}\u231B', {
         body: 'Time\u2019s up \u2014 you\u2019re no longer watching your nearest stations.',
         tag: 'ebike-watch-expired'
       });
@@ -1150,46 +1150,28 @@
     } catch (e) { userLoc = null; }
   }
 
-  function useMyLocation(cb, opts) {
-    opts = opts || {};
-    var silent = !!opts.silent;
-    var maximumAge = typeof opts.maximumAge === 'number' ? opts.maximumAge : 60000;
-
+  function useMyLocation(cb) {
     if (!navigator.geolocation) {
-      if (!silent) showBanner('Location isn\'t available in this browser.');
+      showBanner('Location isn\'t available in this browser.');
       return;
     }
-
-    var originalLabel;
-    if (!silent) {
-      originalLabel = elNearestBtn.innerHTML;
-      elNearestBtn.textContent = 'Finding your location…';
-      elNearestBtn.disabled = true;
-    }
+    var originalLabel = elNearestBtn.innerHTML;
+    elNearestBtn.textContent = 'Finding your location…';
+    elNearestBtn.disabled = true;
 
     navigator.geolocation.getCurrentPosition(function(pos) {
       userLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
       saveLocation();
-      if (!silent) {
-        elNearestBtn.innerHTML = originalLabel;
-        elNearestBtn.disabled = false;
-      }
+      elNearestBtn.innerHTML = originalLabel;
+      elNearestBtn.disabled = false;
       startBackgroundLocationWatch();
       render();
       if (cb) cb();
     }, function(err) {
-      if (!silent) {
-        elNearestBtn.innerHTML = originalLabel;
-        elNearestBtn.disabled = false;
-        showBanner('Couldn\'t get your location. Check Safari\'s location permission for this site and try again.', 8000);
-        return;
-      }
-      // Silent (auto) refresh failed — keep whatever fix we already have
-      // (cached or none) and quietly fall back to the background watch so
-      // we still pick up a position later without bothering the person
-      // with an error on a launch they didn't even ask to trigger.
-      startBackgroundLocationWatch();
-    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: maximumAge });
+      elNearestBtn.innerHTML = originalLabel;
+      elNearestBtn.disabled = false;
+      showBanner('Couldn\'t get your location. Check Safari\'s location permission for this site and try again.', 8000);
+    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
   }
 
   var backgroundWatchId = null;
@@ -1205,6 +1187,46 @@
       // Ignore watch errors silently — we still have the last known fix.
     }, { enableHighAccuracy: false, maximumAge: 10000, timeout: 15000 });
   }
+
+  // Silent version of useMyLocation — no button label/disabled-state churn,
+  // just quietly gets a fresh fix and re-renders. Used when the app returns
+  // to the foreground (see visibilitychange handler below), where a fresh
+  // GPS read matters more than the manual "Nearest" button flow does.
+  function refreshLocationSilently() {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      userLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+      saveLocation();
+      startBackgroundLocationWatch();
+      render();
+    }, function() {
+      // Ignore errors — keep the last known fix, watchPosition (if running)
+      // still covers us going forward.
+    }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 });
+  }
+
+  // Fires whenever the app comes back to the foreground — whether resumed
+  // from a suspended background tab (visibilitychange only, no reload) or a
+  // full relaunch after iOS terminated it (a normal page load, where this
+  // still helps since init() doesn't force a fresh GPS fix if a cached
+  // location already exists).
+  function onAppForeground() {
+    if (userLoc) refreshLocationSilently();
+    refreshStatus();
+    if (notifyWatch) checkNotifyExpiry();
+  }
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') onAppForeground();
+  });
+
+  window.addEventListener('pageshow', function(e) {
+    // e.persisted covers the bfcache-restore case (back/forward navigation
+    // reusing a frozen page) — a different mechanism than visibilitychange,
+    // worth covering too since Home Screen relaunches sometimes hit this
+    // path instead depending on how iOS tore the page down.
+    if (e.persisted) onAppForeground();
+  });
 
   function tickClock() {
     if (lastStatusFetch) {
@@ -1295,14 +1317,14 @@
     if (pushSubscription) return;
     if (prevEbikes === 0 && st.ebikes > 0) {
       try {
-        new Notification('\u{1F50B}', {
+        new Notification('\u{1F6B2}\u2705', {
           body: st.name + ' now has ' + st.ebikes + ' e-bike' + (st.ebikes === 1 ? '' : 's') + ' available.',
           tag: 'ebike-available-' + st.id
         });
       } catch (e) {}
     } else if (prevEbikes !== null && prevEbikes > 0 && st.ebikes === 0) {
       try {
-        new Notification('\u{1FAAB}', {
+        new Notification('\u{1F6B2}\u274C', {
           body: st.name + ' is out of e-bikes.',
           tag: 'ebike-empty-' + st.id
         });
@@ -1509,17 +1531,8 @@
     await loadStationInfo();
     render();
     await refreshStatus();
-    if (!userLoc || isStandalone()) {
-      // A Home Screen launch is a fresh session in a possibly new place —
-      // trusting yesterday's cached lat/lon would sort the board around
-      // wherever the phone happened to be last time, not now. Refresh it
-      // silently; the render() above already showed the last-known fix
-      // (if any) so the board isn't empty while this resolves, and a
-      // failure here shouldn't surface an error the person never asked for.
-      // maximumAge: 0 also stops the OS from handing back its own recently
-      // cached fix — without it, a launch soon after backgrounding could
-      // still get a stale-ish position even though we bypassed our cache.
-      useMyLocation(null, { silent: true, maximumAge: 0 });
+    if (!userLoc) {
+      useMyLocation();
     } else {
       startBackgroundLocationWatch();
     }
