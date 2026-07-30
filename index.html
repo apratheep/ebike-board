@@ -669,8 +669,8 @@
   //   VAPID_PUBLIC_KEY  -> the "public key" printed by `npx web-push generate-vapid-keys`
   // Until both are set, the app falls back to foreground-only notifications
   // (identical to the previous behaviour) and background push is simply skipped.
-  var PUSH_SERVER_URL = '';
-  var VAPID_PUBLIC_KEY = '';
+  var PUSH_SERVER_URL = 'https://ebike-push.onrender.com';
+  var VAPID_PUBLIC_KEY = 'BMSAbYk1s0XU080LZH8BPLYZz9x3oya6S6fuS8kmqaqUmu_x2rU6RfDjj_NEoMGjVeuTQ6hSE7CPa0-0X5pNkgU';
   var pushSubscription = null;
 
   var elSetHomeBtn = document.getElementById('set-home-btn');
