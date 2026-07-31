@@ -323,6 +323,13 @@
     text-decoration: none;
     padding: 0.65rem 1rem calc(0.85rem + env(safe-area-inset-bottom));
   }
+  #board-root .dock-link.is-locating {
+    pointer-events: none;
+    cursor: default;
+  }
+  #board-root .dock-link.is-locating .dock-title-label {
+    opacity: 0.55;
+  }
   #board-root .dock-row {
     display: flex;
     align-items: center;
@@ -1638,10 +1645,22 @@
 
     var dist = distanceKm(userLoc.lat, userLoc.lon, target.lat, target.lon);
     var distLabel = dist < 1 ? Math.round(dist * 1000) + ' m' : dist.toFixed(1) + ' km';
+    // While a fetch is in flight (the pulsing-ring 'locating' state), userLoc
+    // hasn't caught up to the device's actual position yet, so this target
+    // could already be wrong. Leaving the link non-navigable during that
+    // window stops a tap from opening directions to a location that's about
+    // to be superseded a moment later. 'justAcquired' is safe to leave
+    // clickable — by the time it paints, userLoc has already been updated
+    // (see getFreshPosition), it's just playing the one-shot pop animation.
+    var isLocating = locatingState === 'locating';
     var link = document.createElement('a');
-    link.className = 'dock-link';
-    link.href = directionsUrl(target);
+    link.className = 'dock-link' + (isLocating ? ' is-locating' : '');
     link.setAttribute('aria-label', 'Navigate to nearest open dock at ' + target.name);
+    if (isLocating) {
+      link.setAttribute('aria-disabled', 'true');
+    } else {
+      link.href = directionsUrl(target);
+    }
 
     var row = document.createElement('div');
     row.className = 'dock-row';
@@ -1653,7 +1672,7 @@
     var iconPopClass = locatingState === 'justAcquired' ? ' dock-icon-pop' : '';
     title.innerHTML = '<span class="dock-icon-wrap">' + ringSpan +
       '<svg class="' + iconPopClass + '" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>' +
-      '</span><span>DOCK BIKE</span>';
+      '</span><span class="dock-title-label">DOCK BIKE</span>';
 
     var totalLabel = typeof target.capacity === 'number' ? target.capacity : '?';
     var count = document.createElement('div');
