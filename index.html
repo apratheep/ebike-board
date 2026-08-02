@@ -54,13 +54,18 @@
   #board-root .top-band {
     background: var(--board-green-header);
     padding: calc(0.95rem + env(safe-area-inset-top)) 1rem 1.05rem;
-    flex-shrink: 0;
+    flex: 0 0 25%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
   }
   #board-root .body-content {
     padding: 0.85rem 1rem;
-    flex: 0 1 auto;
+    flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
   }
@@ -172,9 +177,8 @@
     transform: translateY(2px);
   }
   #board-root .columns {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 12px;
+    display: flex;
+    flex-direction: column;
   }
   #board-root .columns > div {
     min-width: 0;
@@ -190,7 +194,7 @@
     align-items: center;
     justify-content: space-between;
   }
-  #board-root .col-head.ebike-col { color: var(--board-amber); }
+  #board-root .col-head.ebike-col { color: var(--board-amber); margin-top: 14px; }
   #board-root .col-head-icons {
     display: flex;
     gap: 6px;
@@ -267,23 +271,39 @@
     font-weight: 500;
     color: var(--board-text-dim);
   }
-  #board-root .dir-btn {
+  #board-root .stat-row-lg { padding: 10px 2px; }
+  #board-root .stat-row-lg .stat-name { font-size: 15px; }
+  #board-root .go-btn {
     flex-shrink: 0;
-    width: 22px;
-    height: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--board-accent-dim);
-    color: var(--board-accent);
-    border-radius: 5px;
-    font-size: 11px;
+    background: var(--board-green);
+    color: var(--board-green-dark);
+    font-weight: 800;
+    font-size: 10px;
+    letter-spacing: 0.03em;
     text-decoration: none;
-    line-height: 1;
+    padding: 4px 9px;
+    border-radius: 6px;
+    line-height: 1.4;
   }
-  #board-root .dir-btn:active { background: var(--board-accent); color: #10151a; }
+  #board-root .go-btn:active { opacity: 0.85; }
+  #board-root .stat-row-lg .go-btn {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 7px;
+  }
   @media (min-width: 480px) {
     #board-root .stat-name { font-size: 14px; }
+    #board-root .stat-row-lg .stat-name { font-size: 16px; }
+  }
+  #board-root .stat-right {
+    flex-shrink: 0;
+    text-align: right;
+  }
+  #board-root .stat-top-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-end;
   }
   #board-root .stat-num {
     font-size: 18px;
@@ -293,15 +313,23 @@
   @media (min-width: 480px) {
     #board-root .stat-num { font-size: 20px; }
   }
+  #board-root .stat-row-lg .stat-num { font-size: 22px; }
   #board-root .stat-num.amber { color: var(--board-amber); }
   #board-root .stat-num.zero { color: var(--board-red); }
   #board-root .stat-num.dim { color: var(--board-text-dim); }
+  #board-root .stat-dist-line {
+    font-size: 10px;
+    margin-top: 3px;
+  }
+  #board-root .stat-row-lg .stat-dist-line { font-size: 12px; }
+  #board-root .dist-min { color: var(--board-text); font-weight: 600; }
+  #board-root .dist-sep { color: var(--board-text-dim); margin: 0 2px; }
+  #board-root .dist-meta { color: var(--board-text-dim); }
   #board-root .empty {
     text-align: center;
     padding: 24px 8px;
     color: var(--board-text-dim);
     font-size: 12px;
-    grid-column: 1 / -1;
   }
   #board-root .footer {
     display: flex;
@@ -672,8 +700,8 @@
           </button>
         </span>
       </div>
-      <div class="col-head ebike-col">Nearest w/ e-bike</div>
       <div id="colA"></div>
+      <div class="col-head ebike-col">Nearest w/ e-bike</div>
       <div id="colB"></div>
     </div>
 
@@ -1503,7 +1531,15 @@
       }
     }
     arr.sort(function(a, b) { return a.d - b.d; });
-    return arr.map(function(x) { return x.s; });
+    return arr.map(function(x) { x.s._distKm = x.d; return x.s; });
+  }
+
+  // Rough walking estimate at ~80m/min (~4.8km/h), rounded up to at least 1 min.
+  function walkEstimate(distKm) {
+    var meters = distKm * 1000;
+    var mins = Math.max(1, Math.round(meters / 80));
+    var metersLabel = distKm >= 1 ? distKm.toFixed(1) + ' km' : Math.round(meters) + ' m';
+    return { mins: mins, metersLabel: metersLabel };
   }
 
   function abbreviateName(name) {
@@ -1540,9 +1576,9 @@
       '&q=' + encodeURIComponent(station.name);
   }
 
-  function statRow(station, showDirections, watchIds) {
+  function statRow(station, size, watchIds) {
     var row = document.createElement('div');
-    row.className = 'stat-row';
+    row.className = 'stat-row' + (size === 'large' ? ' stat-row-lg' : '');
 
     var name = document.createElement('div');
     name.className = 'stat-name';
@@ -1564,18 +1600,13 @@
     if (station.id === workStationId) row.appendChild(makeLocRowIcon('work'));
     if (watchIds && watchIds.indexOf(station.id) !== -1) row.appendChild(makeNotifyRowIcon());
 
-    if (showDirections) {
-      var dirBtn = document.createElement('a');
-      dirBtn.className = 'dir-btn';
-      dirBtn.href = directionsUrl(station);
-      dirBtn.target = '_blank';
-      dirBtn.rel = 'noopener';
-      dirBtn.setAttribute('aria-label', 'Directions to ' + station.name);
-      dirBtn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19V11a5 5 0 0 1 5-5h7"/><path d="M14 2l4 4-4 4"/></svg>';
-      row.appendChild(dirBtn);
-    }
+    var right = document.createElement('div');
+    right.className = 'stat-right';
 
-    var num = document.createElement('div');
+    var topLine = document.createElement('div');
+    topLine.className = 'stat-top-line';
+
+    var num = document.createElement('span');
     var v = (station.ebikes === null || station.ebikes === undefined) ? '--' : station.ebikes;
     var cls = 'stat-num mono';
     if (v === '--') cls += ' dim';
@@ -1583,8 +1614,28 @@
     else cls += ' amber';
     num.className = cls;
     num.textContent = v;
-    row.appendChild(num);
+    topLine.appendChild(num);
 
+    var go = document.createElement('a');
+    go.className = 'go-btn';
+    go.href = directionsUrl(station);
+    go.target = '_blank';
+    go.rel = 'noopener';
+    go.setAttribute('aria-label', 'Directions to ' + station.name);
+    go.textContent = 'GO';
+    topLine.appendChild(go);
+
+    right.appendChild(topLine);
+
+    if (typeof station._distKm === 'number') {
+      var w = walkEstimate(station._distKm);
+      var distLine = document.createElement('div');
+      distLine.className = 'stat-dist-line';
+      distLine.innerHTML = '<span class="dist-min">' + w.mins + ' min</span><span class="dist-sep">\u00B7</span><span class="dist-meta">' + w.metersLabel + '</span>';
+      right.appendChild(distLine);
+    }
+
+    row.appendChild(right);
     return row;
   }
 
@@ -1601,31 +1652,29 @@
 
     var byDistance = sortedByDistance();
     var watchIds = notifyActive() ? byDistance.slice(0, NEAREST_WATCH_COUNT).map(function(s) { return s.id; }) : [];
-    var nearest8 = byDistance.filter(function(s) {
-      var e = typeof s.ebikes === 'number' ? s.ebikes : 0;
-      var m = typeof s.mechanical === 'number' ? s.mechanical : 0;
-      return e + m > 0;
-    }).slice(0, 8);
-    var nearestWithEbikes8 = byDistance.filter(function(s) {
-      return typeof s.ebikes === 'number' && s.ebikes > 0;
-    }).slice(0, 8);
+
+    var nearestTop2 = byDistance.slice(0, 2);
+    var nearestTop2Ids = nearestTop2.map(function(s) { return s.id; });
+
+    var nearestWithEbikes5 = byDistance.filter(function(s) {
+      return typeof s.ebikes === 'number' && s.ebikes > 0 && nearestTop2Ids.indexOf(s.id) === -1;
+    }).slice(0, 5);
 
     colA.innerHTML = '';
     colB.innerHTML = '';
 
-    if (nearest8.length === 0) {
+    if (nearestTop2.length === 0) {
       colA.innerHTML = '<div class="empty">No data</div>';
     } else {
-      nearest8.forEach(function(s, idx) {
-        var showDir = idx < 2 && s.ebikes === 0;
-        colA.appendChild(statRow(s, showDir, watchIds));
+      nearestTop2.forEach(function(s) {
+        colA.appendChild(statRow(s, 'compact', watchIds));
       });
     }
 
-    if (nearestWithEbikes8.length === 0) {
+    if (nearestWithEbikes5.length === 0) {
       colB.innerHTML = '<div class="empty">None nearby</div>';
     } else {
-      nearestWithEbikes8.forEach(function(s) { colB.appendChild(statRow(s, true, watchIds)); });
+      nearestWithEbikes5.forEach(function(s) { colB.appendChild(statRow(s, 'large', watchIds)); });
     }
 
     renderDockBand(byDistance);
