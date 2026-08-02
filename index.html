@@ -159,14 +159,16 @@
   }
   #board-root .sub { font-size: 13.5px; color: var(--board-green-dark); opacity: 0.82; margin-bottom: 16px; font-weight: 500; }
   #board-root .nearest-btn {
-    width: 100%;
+    display: block;
+    width: 82%;
+    margin: 0 auto;
     background: var(--board-green-dark);
     border: none;
     color: #ffffff;
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.02em;
-    padding: 14px;
+    padding: 16px 14px;
     border-radius: 10px;
     cursor: pointer;
     box-shadow: 0 3px 0 #123f28, 0 4px 8px rgba(0, 0, 0, 0.15);
@@ -194,7 +196,7 @@
     align-items: center;
     justify-content: space-between;
   }
-  #board-root .col-head.ebike-col { color: var(--board-amber); margin-top: 14px; }
+  #board-root .col-head.ebike-col { color: var(--board-amber); margin-top: 10px; }
   #board-root .col-head-icons {
     display: flex;
     gap: 6px;
@@ -246,13 +248,13 @@
     align-items: center;
     justify-content: space-between;
     gap: 6px;
-    padding: 8px 2px;
-    border-bottom: 1px solid var(--board-line);
+    padding: 6px 2px;
+    border-bottom: 1px solid rgba(75, 85, 103, 0.4);
   }
   #board-root .stat-row:last-child { border-bottom: none; }
   #board-root .stat-name {
-    font-size: 13px;
-    line-height: 1.2;
+    font-size: 14px;
+    line-height: 1.25;
     color: var(--board-text);
     flex: 1;
     min-width: 0;
@@ -271,29 +273,29 @@
     font-weight: 500;
     color: var(--board-text-dim);
   }
-  #board-root .stat-row-lg { padding: 10px 2px; }
-  #board-root .stat-row-lg .stat-name { font-size: 15px; }
+  #board-root .stat-row-lg { padding: 8px 2px; }
+  #board-root .stat-row-lg .stat-name { font-size: 17px; }
   #board-root .go-btn {
     flex-shrink: 0;
     background: var(--board-green);
     color: var(--board-green-dark);
     font-weight: 800;
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 0.03em;
     text-decoration: none;
-    padding: 4px 9px;
+    padding: 5px 10px;
     border-radius: 6px;
     line-height: 1.4;
   }
   #board-root .go-btn:active { opacity: 0.85; }
   #board-root .stat-row-lg .go-btn {
-    font-size: 12px;
-    padding: 5px 12px;
+    font-size: 13px;
+    padding: 6px 14px;
     border-radius: 7px;
   }
   @media (min-width: 480px) {
-    #board-root .stat-name { font-size: 14px; }
-    #board-root .stat-row-lg .stat-name { font-size: 16px; }
+    #board-root .stat-name { font-size: 15px; }
+    #board-root .stat-row-lg .stat-name { font-size: 18px; }
   }
   #board-root .stat-right {
     flex-shrink: 0;
@@ -306,22 +308,22 @@
     justify-content: flex-end;
   }
   #board-root .stat-num {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     flex-shrink: 0;
   }
   @media (min-width: 480px) {
-    #board-root .stat-num { font-size: 20px; }
+    #board-root .stat-num { font-size: 22px; }
   }
-  #board-root .stat-row-lg .stat-num { font-size: 22px; }
+  #board-root .stat-row-lg .stat-num { font-size: 26px; }
   #board-root .stat-num.amber { color: var(--board-amber); }
   #board-root .stat-num.zero { color: var(--board-red); }
   #board-root .stat-num.dim { color: var(--board-text-dim); }
   #board-root .stat-dist-line {
-    font-size: 10px;
+    font-size: 11px;
     margin-top: 3px;
   }
-  #board-root .stat-row-lg .stat-dist-line { font-size: 12px; }
+  #board-root .stat-row-lg .stat-dist-line { font-size: 13px; }
   #board-root .dist-min { color: var(--board-text); font-weight: 600; }
   #board-root .dist-sep { color: var(--board-text-dim); margin: 0 2px; }
   #board-root .dist-meta { color: var(--board-text-dim); }
