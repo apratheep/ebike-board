@@ -18,7 +18,7 @@
 </style>
 </head>
 <body>
-<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Live e-bike availability at the 8 nearest Bike Share Toronto stations, split into all-nearest and nearest-with-ebikes, auto-refreshing every 25 seconds</h2>
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Live e-bike availability for the 2 nearest Bike Share Toronto stations plus the 5 nearest stations with e-bikes available, auto-refreshing every 25 seconds</h2>
 <style>
   #board-root {
     --board-bg: #2b3140;
@@ -53,19 +53,14 @@
   #board-root .mono { font-family: 'Courier New', ui-monospace, Menlo, monospace; }
   #board-root .top-band {
     background: var(--board-green-header);
-    padding: calc(0.95rem + env(safe-area-inset-top)) 1rem 1.05rem;
-    flex: 0 0 25%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    box-sizing: border-box;
+    padding: calc(1.45rem + env(safe-area-inset-top)) 1.1rem 1.6rem;
+    flex-shrink: 0;
   }
   #board-root .body-content {
     padding: 0.85rem 1rem;
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-height: 0;
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
   }
@@ -92,14 +87,14 @@
     min-width: 0;
     padding-right: 44px;
     line-height: 1;
-    font-size: 18px;
+    font-size: 21px;
     letter-spacing: 0.03em;
     text-transform: uppercase;
     font-weight: 800;
     color: var(--board-green-dark);
   }
   @media (min-width: 480px) {
-    #board-root .title { font-size: 20px; letter-spacing: 0.04em; }
+    #board-root .title { font-size: 23px; letter-spacing: 0.04em; }
   }
   #board-root .add-home-btn {
     background: none;
@@ -115,8 +110,8 @@
   #board-root .add-home-btn:active { opacity: 1; }
   #board-root .enable-notify-btn {
     position: relative;
-    width: 26px;
-    height: 26px;
+    width: 30px;
+    height: 30px;
     border: 1.5px solid currentColor;
     border-radius: 50%;
     padding: 0;
@@ -129,16 +124,16 @@
     position: absolute;
     top: -1px;
     right: -1px;
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--board-green-dark);
     z-index: 0;
   }
   #board-root .loc-icon-btn.notify-header-btn {
     position: relative;
-    width: 34px;
-    height: 34px;
+    width: 38px;
+    height: 38px;
     border: 2px solid currentColor;
     border-radius: 50%;
     color: var(--board-green-dark);
@@ -149,26 +144,24 @@
   #board-root .loc-icon-btn.notify-header-btn .loc-badge {
     top: -3px;
     right: -3px;
-    width: 12px;
-    height: 12px;
+    width: 13px;
+    height: 13px;
     border: 1.5px solid var(--board-green-header);
   }
   #board-root .loc-icon-btn.notify-header-btn.is-set {
     border: none;
     opacity: 0.4;
   }
-  #board-root .sub { font-size: 13.5px; color: var(--board-green-dark); opacity: 0.82; margin-bottom: 16px; font-weight: 500; }
+  #board-root .sub { font-size: 15px; color: var(--board-green-dark); opacity: 0.82; margin-bottom: 20px; font-weight: 500; }
   #board-root .nearest-btn {
-    display: block;
-    width: 82%;
-    margin: 0 auto;
+    width: 100%;
     background: var(--board-green-dark);
     border: none;
     color: #ffffff;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
     letter-spacing: 0.02em;
-    padding: 16px 14px;
+    padding: 16px;
     border-radius: 10px;
     cursor: pointer;
     box-shadow: 0 3px 0 #123f28, 0 4px 8px rgba(0, 0, 0, 0.15);
@@ -178,12 +171,8 @@
     box-shadow: 0 1px 0 #123f28, 0 2px 4px rgba(0, 0, 0, 0.15);
     transform: translateY(2px);
   }
-  #board-root .columns {
-    display: flex;
-    flex-direction: column;
-  }
-  #board-root .columns > div {
-    min-width: 0;
+  #board-root .station-list {
+    -webkit-overflow-scrolling: touch;
   }
   #board-root .col-head {
     font-size: 11px;
@@ -196,7 +185,14 @@
     align-items: center;
     justify-content: space-between;
   }
-  #board-root .col-head.ebike-col { color: var(--board-amber); margin-top: 10px; }
+  #board-root .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--board-amber);
+    padding: 12px 2px 6px;
+  }
   #board-root .col-head-icons {
     display: flex;
     gap: 6px;
@@ -247,19 +243,23 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 6px;
-    padding: 6px 2px;
-    border-bottom: 1px solid rgba(75, 85, 103, 0.4);
+    gap: 8px;
+    padding: 10px 2px;
+    border-bottom: 1px solid var(--board-line);
   }
   #board-root .stat-row:last-child { border-bottom: none; }
+  #board-root .stat-row.stat-row-ebike { padding: 11px 2px; }
   #board-root .stat-name {
     font-size: 14px;
-    line-height: 1.25;
+    line-height: 1.2;
     color: var(--board-text);
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
+  }
+  #board-root .stat-row-ebike .stat-name {
+    font-size: 17px;
   }
   #board-root .stat-name .line {
     white-space: nowrap;
@@ -273,60 +273,61 @@
     font-weight: 500;
     color: var(--board-text-dim);
   }
-  #board-root .stat-row-lg { padding: 8px 2px; }
-  #board-root .stat-row-lg .stat-name { font-size: 17px; }
-  #board-root .go-btn {
+  #board-root .go-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
     flex-shrink: 0;
-    background: var(--board-green);
-    color: var(--board-green-dark);
-    font-weight: 800;
-    font-size: 11px;
-    letter-spacing: 0.03em;
-    text-decoration: none;
-    padding: 5px 10px;
-    border-radius: 6px;
-    line-height: 1.4;
   }
-  #board-root .go-btn:active { opacity: 0.85; }
-  #board-root .stat-row-lg .go-btn {
-    font-size: 13px;
-    padding: 6px 14px;
-    border-radius: 7px;
+  #board-root .go-info-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #board-root .go-btn {
+    background: var(--board-green);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    padding: 4px 14px;
+    border-radius: 20px;
+    text-decoration: none;
+    display: inline-block;
+    line-height: 1.5;
+  }
+  #board-root .go-btn:active { opacity: 0.8; }
+  #board-root .go-walk {
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  #board-root .go-walk .go-min {
+    color: var(--board-text);
+    font-weight: 600;
+  }
+  #board-root .go-walk .go-dist {
+    color: var(--board-text-dim);
   }
   @media (min-width: 480px) {
     #board-root .stat-name { font-size: 15px; }
-    #board-root .stat-row-lg .stat-name { font-size: 18px; }
-  }
-  #board-root .stat-right {
-    flex-shrink: 0;
-    text-align: right;
-  }
-  #board-root .stat-top-line {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    justify-content: flex-end;
+    #board-root .stat-row-ebike .stat-name { font-size: 18px; }
   }
   #board-root .stat-num {
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 700;
     flex-shrink: 0;
   }
-  @media (min-width: 480px) {
-    #board-root .stat-num { font-size: 22px; }
+  #board-root .stat-row-ebike .stat-num {
+    font-size: 25px;
   }
-  #board-root .stat-row-lg .stat-num { font-size: 26px; }
+  @media (min-width: 480px) {
+    #board-root .stat-num { font-size: 20px; }
+    #board-root .stat-row-ebike .stat-num { font-size: 26px; }
+  }
   #board-root .stat-num.amber { color: var(--board-amber); }
   #board-root .stat-num.zero { color: var(--board-red); }
   #board-root .stat-num.dim { color: var(--board-text-dim); }
-  #board-root .stat-dist-line {
-    font-size: 11px;
-    margin-top: 3px;
-  }
-  #board-root .stat-row-lg .stat-dist-line { font-size: 13px; }
-  #board-root .dist-min { color: var(--board-text); font-weight: 600; }
-  #board-root .dist-sep { color: var(--board-text-dim); margin: 0 2px; }
-  #board-root .dist-meta { color: var(--board-text-dim); }
   #board-root .empty {
     text-align: center;
     padding: 24px 8px;
@@ -665,30 +666,30 @@
       <span class="title">Bike share TO — e-bikes</span>
       <span class="head-icons">
         <button type="button" id="enable-notify-btn" class="add-home-btn enable-notify-btn" aria-label="Get notified about e-bikes" title="Get notified about e-bikes" style="display:none;">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0v3.5l1.5 2.5h-15l1.5-2.5V10z"/><path d="M9.5 18.5a2.5 2.5 0 0 0 5 0"/></svg>
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0v3.5l1.5 2.5h-15l1.5-2.5V10z"/><path d="M9.5 18.5a2.5 2.5 0 0 0 5 0"/></svg>
           <span class="enable-notify-dot"></span>
         </button>
         <button type="button" class="loc-icon-btn notify-header-btn" id="set-notify-btn" aria-label="Notify me when e-bikes are available" title="Notify me when e-bikes are available" style="display:none;">
-          <svg class="icon-filled" viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path d="M12 2a1 1 0 0 1 1 1v.1c3.4.46 6 3.4 6 6.9v4.3l1.6 2.4c.42.63-.03 1.4-.78 1.4H4.18c-.75 0-1.2-.77-.78-1.4L5 14.3V10c0-3.5 2.6-6.44 6-6.9V3a1 1 0 0 1 1-1z"/><circle cx="12" cy="20" r="1.6"/></svg>
-          <svg class="icon-outline" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0v3.5l1.5 2.5h-15l1.5-2.5V10z"/><path d="M9.5 18.5a2.5 2.5 0 0 0 5 0"/></svg>
+          <svg class="icon-filled" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2a1 1 0 0 1 1 1v.1c3.4.46 6 3.4 6 6.9v4.3l1.6 2.4c.42.63-.03 1.4-.78 1.4H4.18c-.75 0-1.2-.77-.78-1.4L5 14.3V10c0-3.5 2.6-6.44 6-6.9V3a1 1 0 0 1 1-1z"/><circle cx="12" cy="20" r="1.6"/></svg>
+          <svg class="icon-outline" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0v3.5l1.5 2.5h-15l1.5-2.5V10z"/><path d="M9.5 18.5a2.5 2.5 0 0 0 5 0"/></svg>
           <span class="loc-badge"></span>
         </button>
         <button type="button" id="add-home-btn" class="add-home-btn" aria-label="Add to Home Screen" title="Add to Home Screen">
-          <svg viewBox="0 0 32 24" width="30" height="23"><rect x="18" y="2" width="12" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="19.5" y="4" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="24.5" y="4" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="19.5" y="9" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="24.5" y="9" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="19.5" y="14" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="24.5" y="14" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="22" y="19" width="4" height="1.2" rx="0.6" fill="currentColor"/><path d="M2,10 L12,10 L12,6 L18,12 L12,18 L12,14 L2,14 Z" fill="currentColor"/></svg>
+          <svg viewBox="0 0 32 24" width="34" height="26"><rect x="18" y="2" width="12" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="19.5" y="4" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="24.5" y="4" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="19.5" y="9" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="24.5" y="9" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="19.5" y="14" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="24.5" y="14" width="4" height="4" rx="1" fill="currentColor" opacity="0.85"/><rect x="22" y="19" width="4" height="1.2" rx="0.6" fill="currentColor"/><path d="M2,10 L12,10 L12,6 L18,12 L12,18 L12,14 L2,14 Z" fill="currentColor"/></svg>
         </button>
       </span>
     </div>
     <div class="sub">Find the nearest stations w/ e-bike availability.</div>
 
     <button id="nearest-btn" type="button" class="nearest-btn">
-    <svg viewBox="0 0 24 24" width="16" height="16" fill="var(--board-amber)" style="vertical-align:-3px;margin-right:5px;"><path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 7 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>Refresh my location
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--board-amber)" style="vertical-align:-3px;margin-right:5px;"><path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 7 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>Refresh my location
   </button>
   </div>
 
   <div class="body-content">
     <div class="columns" id="columns">
       <div class="col-head">
-        <span>Nearest</span>
+        <span>Nearest stations</span>
         <span class="col-head-icons">
           <button type="button" class="loc-icon-btn" id="set-home-btn" aria-label="Set home station">
             <svg class="icon-filled" viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M12 3.2l9 7.8h-2.2v9.5h-4.8v-6.2h-4v6.2H4.2v-9.5H2z"/></svg>
@@ -702,9 +703,7 @@
           </button>
         </span>
       </div>
-      <div id="colA"></div>
-      <div class="col-head ebike-col">Nearest w/ e-bike</div>
-      <div id="colB"></div>
+      <div class="station-list" id="stationList"></div>
     </div>
 
     <div class="footer">
@@ -1533,15 +1532,7 @@
       }
     }
     arr.sort(function(a, b) { return a.d - b.d; });
-    return arr.map(function(x) { x.s._distKm = x.d; return x.s; });
-  }
-
-  // Rough walking estimate at ~80m/min (~4.8km/h), rounded up to at least 1 min.
-  function walkEstimate(distKm) {
-    var meters = distKm * 1000;
-    var mins = Math.max(1, Math.round(meters / 80));
-    var metersLabel = distKm >= 1 ? distKm.toFixed(1) + ' km' : Math.round(meters) + ' m';
-    return { mins: mins, metersLabel: metersLabel };
+    return arr.map(function(x) { return x.s; });
   }
 
   function abbreviateName(name) {
@@ -1578,9 +1569,15 @@
       '&q=' + encodeURIComponent(station.name);
   }
 
-  function statRow(station, size, watchIds) {
+  var WALK_METERS_PER_MIN = 83.33; // ~5 km/h, the standard pace Google/Apple Maps use for walking estimates
+
+  function formatDistance(distKm) {
+    return distKm < 1 ? Math.round(distKm * 1000) + ' m' : distKm.toFixed(1) + ' km';
+  }
+
+  function statRow(station, isFeatured, watchIds) {
     var row = document.createElement('div');
-    row.className = 'stat-row' + (size === 'large' ? ' stat-row-lg' : '');
+    row.className = 'stat-row' + (isFeatured ? ' stat-row-ebike' : '');
 
     var name = document.createElement('div');
     name.className = 'stat-name';
@@ -1602,13 +1599,13 @@
     if (station.id === workStationId) row.appendChild(makeLocRowIcon('work'));
     if (watchIds && watchIds.indexOf(station.id) !== -1) row.appendChild(makeNotifyRowIcon());
 
-    var right = document.createElement('div');
-    right.className = 'stat-right';
+    var info = document.createElement('div');
+    info.className = 'go-info';
 
-    var topLine = document.createElement('div');
-    topLine.className = 'stat-top-line';
+    var top = document.createElement('div');
+    top.className = 'go-info-top';
 
-    var num = document.createElement('span');
+    var num = document.createElement('div');
     var v = (station.ebikes === null || station.ebikes === undefined) ? '--' : station.ebikes;
     var cls = 'stat-num mono';
     if (v === '--') cls += ' dim';
@@ -1616,38 +1613,38 @@
     else cls += ' amber';
     num.className = cls;
     num.textContent = v;
-    topLine.appendChild(num);
+    top.appendChild(num);
 
     var go = document.createElement('a');
     go.className = 'go-btn';
     go.href = directionsUrl(station);
     go.target = '_blank';
     go.rel = 'noopener';
-    go.setAttribute('aria-label', 'Directions to ' + station.name);
     go.textContent = 'GO';
-    topLine.appendChild(go);
+    go.setAttribute('aria-label', 'Directions to ' + station.name);
+    top.appendChild(go);
 
-    right.appendChild(topLine);
+    info.appendChild(top);
 
-    if (typeof station._distKm === 'number') {
-      var w = walkEstimate(station._distKm);
-      var distLine = document.createElement('div');
-      distLine.className = 'stat-dist-line';
-      distLine.innerHTML = '<span class="dist-min">' + w.mins + ' min</span><span class="dist-sep">\u00B7</span><span class="dist-meta">' + w.metersLabel + '</span>';
-      right.appendChild(distLine);
+    if (userLoc && typeof station.lat === 'number' && typeof station.lon === 'number') {
+      var distKm = distanceKm(userLoc.lat, userLoc.lon, station.lat, station.lon);
+      var mins = Math.max(1, Math.round((distKm * 1000) / WALK_METERS_PER_MIN));
+      var walk = document.createElement('div');
+      walk.className = 'go-walk';
+      walk.innerHTML = '<span class="go-min">' + mins + ' min</span><span class="go-dist"> · ' + formatDistance(distKm) + '</span>';
+      info.appendChild(walk);
     }
 
-    row.appendChild(right);
+    row.appendChild(info);
+
     return row;
   }
 
   function render() {
-    var colA = document.getElementById('colA');
-    var colB = document.getElementById('colB');
+    var list = document.getElementById('stationList');
 
     if (!userLoc) {
-      colA.innerHTML = '<div class="empty">Tap "Refresh my location" above to find your nearest stations.</div>';
-      colB.innerHTML = '';
+      list.innerHTML = '<div class="empty">Tap "Refresh my location" above to find your nearest stations.</div>';
       elBottomBand.innerHTML = '';
       return;
     }
@@ -1655,28 +1652,36 @@
     var byDistance = sortedByDistance();
     var watchIds = notifyActive() ? byDistance.slice(0, NEAREST_WATCH_COUNT).map(function(s) { return s.id; }) : [];
 
-    var nearestTop2 = byDistance.slice(0, 2);
-    var nearestTop2Ids = nearestTop2.map(function(s) { return s.id; });
-
+    var nearest2 = byDistance.slice(0, 2);
+    var nearest2Ids = nearest2.map(function(s) { return s.id; });
+    // Excludes anything already shown above so all 7 rows are distinct
+    // stations — in the old side-by-side columns the same station could
+    // reasonably appear in both lists at once, but stacked in one list that
+    // would just look like a duplicate row.
     var nearestWithEbikes5 = byDistance.filter(function(s) {
-      return typeof s.ebikes === 'number' && s.ebikes > 0 && nearestTop2Ids.indexOf(s.id) === -1;
+      return typeof s.ebikes === 'number' && s.ebikes > 0 && nearest2Ids.indexOf(s.id) === -1;
     }).slice(0, 5);
 
-    colA.innerHTML = '';
-    colB.innerHTML = '';
+    list.innerHTML = '';
 
-    if (nearestTop2.length === 0) {
-      colA.innerHTML = '<div class="empty">No data</div>';
+    if (nearest2.length === 0) {
+      list.innerHTML = '<div class="empty">No data</div>';
     } else {
-      nearestTop2.forEach(function(s) {
-        colA.appendChild(statRow(s, 'compact', watchIds));
-      });
-    }
+      nearest2.forEach(function(s) { list.appendChild(statRow(s, false, watchIds)); });
 
-    if (nearestWithEbikes5.length === 0) {
-      colB.innerHTML = '<div class="empty">None nearby</div>';
-    } else {
-      nearestWithEbikes5.forEach(function(s) { colB.appendChild(statRow(s, 'large', watchIds)); });
+      var label = document.createElement('div');
+      label.className = 'section-label';
+      label.textContent = 'Nearest with e-bikes';
+      list.appendChild(label);
+
+      if (nearestWithEbikes5.length === 0) {
+        var none = document.createElement('div');
+        none.className = 'empty';
+        none.textContent = 'None nearby';
+        list.appendChild(none);
+      } else {
+        nearestWithEbikes5.forEach(function(s) { list.appendChild(statRow(s, true, watchIds)); });
+      }
     }
 
     renderDockBand(byDistance);
