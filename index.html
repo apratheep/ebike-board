@@ -247,11 +247,16 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    padding: 7px 2px;
-    border-bottom: 1px solid var(--board-line);
+    gap: 10px;
+    padding: 12px;
+    background: var(--board-panel);
+    border: 1px solid transparent;
+    border-radius: 12px;
+    margin-bottom: 8px;
   }
-  #board-root .stat-row:last-child { border-bottom: none; }
+  #board-root .stat-row-ebike {
+    border-color: var(--board-amber);
+  }
   #board-root .stat-name {
     font-size: 14px;
     line-height: 1.15;
@@ -268,20 +273,20 @@
   }
   #board-root .stat-name .line1 {
     font-weight: 700;
+    margin-top: 2px;
   }
   #board-root .stat-name .line2 {
     font-weight: 500;
     color: var(--board-text-dim);
   }
   #board-root .stat-num {
-    font-size: 15px;
-    font-weight: 700;
-    flex-shrink: 0;
+    font-size: 17px;
+    font-weight: 800;
     white-space: nowrap;
   }
   @media (min-width: 480px) {
     #board-root .stat-name { font-size: 15px; }
-    #board-root .stat-num { font-size: 16px; }
+    #board-root .stat-num { font-size: 18px; }
   }
   #board-root .stat-num.amber { color: var(--board-amber); }
   #board-root .stat-num.zero { color: var(--board-red); }
@@ -296,15 +301,16 @@
   #board-root .go-btn {
     background: var(--board-accent);
     color: #ffffff;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 800;
     letter-spacing: 0.02em;
-    padding: 6px 14px;
-    border-radius: 8px;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
     text-decoration: none;
-    display: block;
-    text-align: center;
-    min-width: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   #board-root .go-btn:active { opacity: 0.8; }
   #board-root .go-walk {
@@ -1572,6 +1578,17 @@
     var name = document.createElement('div');
     name.className = 'stat-name';
     name.title = station.name;
+
+    var num = document.createElement('div');
+    var v = (station.ebikes === null || station.ebikes === undefined) ? '--' : station.ebikes;
+    var cls = 'stat-num';
+    if (v === '--') cls += ' dim';
+    else if (v === 0) cls += ' zero';
+    else cls += ' amber';
+    num.className = cls;
+    num.textContent = v === '--' ? '--' : (v + ' e-bike' + (v === 1 ? '' : 's'));
+    name.appendChild(num);
+
     var lines = nameLines(abbreviateName(station.name));
     var l1 = document.createElement('div');
     l1.className = 'line line1';
@@ -1588,16 +1605,6 @@
     if (station.id === homeStationId) row.appendChild(makeLocRowIcon('home'));
     if (station.id === workStationId) row.appendChild(makeLocRowIcon('work'));
     if (watchIds && watchIds.indexOf(station.id) !== -1) row.appendChild(makeNotifyRowIcon());
-
-    var num = document.createElement('div');
-    var v = (station.ebikes === null || station.ebikes === undefined) ? '--' : station.ebikes;
-    var cls = 'stat-num';
-    if (v === '--') cls += ' dim';
-    else if (v === 0) cls += ' zero';
-    else cls += ' amber';
-    num.className = cls;
-    num.textContent = v === '--' ? '--' : (v + ' e-bike' + (v === 1 ? '' : 's'));
-    row.appendChild(num);
 
     var info = document.createElement('div');
     info.className = 'go-info';
