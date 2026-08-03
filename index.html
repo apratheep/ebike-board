@@ -57,7 +57,7 @@
     flex-shrink: 0;
   }
   #board-root .body-content {
-    padding: 0.85rem 1rem;
+    padding: 0.65rem 0.85rem;
     flex: 0 1 auto;
     min-height: 0;
     overflow-y: auto;
@@ -175,23 +175,23 @@
     -webkit-overflow-scrolling: touch;
   }
   #board-root .col-head {
-    font-size: 11px;
+    font-size: 12.5px;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--board-text-dim);
-    padding: 0 2px 8px;
+    padding: 0 2px 6px;
     border-bottom: 1px solid var(--board-line);
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
   #board-root .section-label {
-    font-size: 11px;
+    font-size: 12.5px;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--board-amber);
-    padding: 12px 2px 6px;
+    padding: 8px 2px 5px;
   }
   #board-root .col-head-icons {
     display: flex;
@@ -244,22 +244,18 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    padding: 10px 2px;
+    padding: 7px 2px;
     border-bottom: 1px solid var(--board-line);
   }
   #board-root .stat-row:last-child { border-bottom: none; }
-  #board-root .stat-row.stat-row-ebike { padding: 11px 2px; }
   #board-root .stat-name {
     font-size: 14px;
-    line-height: 1.2;
+    line-height: 1.15;
     color: var(--board-text);
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
-  }
-  #board-root .stat-row-ebike .stat-name {
-    font-size: 17px;
   }
   #board-root .stat-name .line {
     white-space: nowrap;
@@ -273,33 +269,43 @@
     font-weight: 500;
     color: var(--board-text-dim);
   }
+  #board-root .stat-num {
+    font-size: 19px;
+    font-weight: 700;
+    flex-shrink: 0;
+    min-width: 22px;
+    text-align: center;
+  }
+  @media (min-width: 480px) {
+    #board-root .stat-name { font-size: 15px; }
+    #board-root .stat-num { font-size: 20px; }
+  }
+  #board-root .stat-num.amber { color: var(--board-amber); }
+  #board-root .stat-num.zero { color: var(--board-red); }
+  #board-root .stat-num.dim { color: var(--board-text-dim); }
   #board-root .go-info {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
     flex-shrink: 0;
-  }
-  #board-root .go-info-top {
-    display: flex;
-    align-items: center;
-    gap: 8px;
   }
   #board-root .go-btn {
     background: var(--board-green);
     color: #ffffff;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 800;
-    letter-spacing: 0.03em;
-    padding: 4px 14px;
-    border-radius: 20px;
+    letter-spacing: 0.02em;
+    padding: 6px 14px;
+    border-radius: 8px;
     text-decoration: none;
-    display: inline-block;
-    line-height: 1.5;
+    display: block;
+    text-align: center;
+    min-width: 38px;
   }
   #board-root .go-btn:active { opacity: 0.8; }
   #board-root .go-walk {
-    font-size: 12px;
+    font-size: 11px;
     white-space: nowrap;
   }
   #board-root .go-walk .go-min {
@@ -309,25 +315,6 @@
   #board-root .go-walk .go-dist {
     color: var(--board-text-dim);
   }
-  @media (min-width: 480px) {
-    #board-root .stat-name { font-size: 15px; }
-    #board-root .stat-row-ebike .stat-name { font-size: 18px; }
-  }
-  #board-root .stat-num {
-    font-size: 19px;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-  #board-root .stat-row-ebike .stat-num {
-    font-size: 25px;
-  }
-  @media (min-width: 480px) {
-    #board-root .stat-num { font-size: 20px; }
-    #board-root .stat-row-ebike .stat-num { font-size: 26px; }
-  }
-  #board-root .stat-num.amber { color: var(--board-amber); }
-  #board-root .stat-num.zero { color: var(--board-red); }
-  #board-root .stat-num.dim { color: var(--board-text-dim); }
   #board-root .empty {
     text-align: center;
     padding: 24px 8px;
@@ -692,13 +679,13 @@
         <span>Nearest stations</span>
         <span class="col-head-icons">
           <button type="button" class="loc-icon-btn" id="set-home-btn" aria-label="Set home station">
-            <svg class="icon-filled" viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M12 3.2l9 7.8h-2.2v9.5h-4.8v-6.2h-4v6.2H4.2v-9.5H2z"/></svg>
-            <svg class="icon-outline" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+            <svg class="icon-filled" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 3.2l9 7.8h-2.2v9.5h-4.8v-6.2h-4v6.2H4.2v-9.5H2z"/></svg>
+            <svg class="icon-outline" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
             <span class="loc-badge"></span>
           </button>
           <button type="button" class="loc-icon-btn" id="set-work-btn" aria-label="Set work station">
-            <svg class="icon-filled" viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M9 3.2a2 2 0 0 0-2 2v1H4.2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h15.6a2 2 0 0 0 2-2v-10a2 2 0 0 0-2-2H17v-1a2 2 0 0 0-2-2H9zm0 2h6v1H9v-1zM2.2 12h19.6v-1.8H2.2V12z"/></svg>
-            <svg class="icon-outline" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <svg class="icon-filled" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M9 3.2a2 2 0 0 0-2 2v1H4.2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h15.6a2 2 0 0 0 2-2v-10a2 2 0 0 0-2-2H17v-1a2 2 0 0 0-2-2H9zm0 2h6v1H9v-1zM2.2 12h19.6v-1.8H2.2V12z"/></svg>
+            <svg class="icon-outline" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
             <span class="loc-badge"></span>
           </button>
         </span>
@@ -884,9 +871,9 @@
     span.setAttribute('aria-label', type === 'home' ? 'Home station' : 'Work station');
     span.title = type === 'home' ? 'Home station' : 'Work station';
     if (type === 'home') {
-      span.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>';
+      span.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>';
     } else {
-      span.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+      span.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
     }
     return span;
   }
@@ -898,7 +885,7 @@
     var label = mins ? ('Watching for e-bike changes — ' + mins + ' min left') : 'Watching for e-bike changes';
     span.setAttribute('aria-label', label);
     span.title = label;
-    span.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0v3.5l1.5 2.5h-15l1.5-2.5V10z"/><path d="M9.5 18.5a2.5 2.5 0 0 0 5 0"/></svg>';
+    span.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0v3.5l1.5 2.5h-15l1.5-2.5V10z"/><path d="M9.5 18.5a2.5 2.5 0 0 0 5 0"/></svg>';
     return span;
   }
 
@@ -1599,12 +1586,6 @@
     if (station.id === workStationId) row.appendChild(makeLocRowIcon('work'));
     if (watchIds && watchIds.indexOf(station.id) !== -1) row.appendChild(makeNotifyRowIcon());
 
-    var info = document.createElement('div');
-    info.className = 'go-info';
-
-    var top = document.createElement('div');
-    top.className = 'go-info-top';
-
     var num = document.createElement('div');
     var v = (station.ebikes === null || station.ebikes === undefined) ? '--' : station.ebikes;
     var cls = 'stat-num mono';
@@ -1613,7 +1594,10 @@
     else cls += ' amber';
     num.className = cls;
     num.textContent = v;
-    top.appendChild(num);
+    row.appendChild(num);
+
+    var info = document.createElement('div');
+    info.className = 'go-info';
 
     var go = document.createElement('a');
     go.className = 'go-btn';
@@ -1622,9 +1606,7 @@
     go.rel = 'noopener';
     go.textContent = 'GO';
     go.setAttribute('aria-label', 'Directions to ' + station.name);
-    top.appendChild(go);
-
-    info.appendChild(top);
+    info.appendChild(go);
 
     if (userLoc && typeof station.lat === 'number' && typeof station.lon === 'number') {
       var distKm = distanceKm(userLoc.lat, userLoc.lon, station.lat, station.lon);
