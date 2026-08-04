@@ -242,6 +242,14 @@
     color: var(--board-text-dim);
     display: flex;
   }
+  #board-root .row-icon-slot {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   #board-root .pin-hint-btn {
     display: inline-flex;
     align-items: center;
@@ -726,8 +734,8 @@
         <span>Nearest | Pinned Stations</span>
         <span class="col-head-icons">
           <button type="button" class="loc-icon-btn" id="set-pin-btn" aria-label="Pin stations" title="Pin stations">
-            <svg class="icon-filled" viewBox="0 0 24 24" width="23" height="23" fill="currentColor"><path d="M12 2a4 4 0 0 0-4 4c0 2 1.2 3 2 3.6L7 13v2h4v6h2v-6h4v-2l-3-3.4c.8-.6 2-1.6 2-3.6a4 4 0 0 0-4-4z"/></svg>
-            <svg class="icon-outline" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4c0 2 1.2 3 2 3.6L7 13v2h4v6h2v-6h4v-2l-3-3.4c.8-.6 2-1.6 2-3.6a4 4 0 0 0-4-4z"/></svg>
+            <svg class="icon-filled" viewBox="0 0 24 24" width="23" height="23" fill="currentColor"><g transform="rotate(45 12 12)"><rect x="6.5" y="3" width="11" height="6" rx="1.5"/><path d="M9 9L12 22l3-13z"/></g></svg>
+            <svg class="icon-outline" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(45 12 12)"><rect x="6.5" y="3" width="11" height="6" rx="1.5"/><path d="M9 9L12 22l3-13z"/></g></svg>
             <span class="loc-badge"></span>
           </button>
           <button type="button" class="loc-icon-btn" id="set-home-btn" aria-label="Set home station">
@@ -956,7 +964,7 @@
     } else if (type === 'work') {
       span.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
     } else {
-      span.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4c0 2 1.2 3 2 3.6L7 13v2h4v6h2v-6h4v-2l-3-3.4c.8-.6 2-1.6 2-3.6a4 4 0 0 0-4-4z"/></svg>';
+      span.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(45 12 12)"><rect x="6.5" y="3" width="11" height="6" rx="1.5"/><path d="M9 9L12 22l3-13z"/></g></svg>';
     }
     return span;
   }
@@ -1735,7 +1743,7 @@
       pinHint.type = 'button';
       pinHint.className = 'pin-hint-btn';
       pinHint.setAttribute('aria-label', 'Pin ' + station.name + ' to the top');
-      pinHint.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2a4 4 0 0 0-4 4c0 2 1.2 3 2 3.6L7 13v2h4v6h2v-6h4v-2l-3-3.4c.8-.6 2-1.6 2-3.6a4 4 0 0 0-4-4z"/></svg><span>Pin this station</span>';
+      pinHint.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><g transform="rotate(45 12 12)"><rect x="6.5" y="3" width="11" height="6" rx="1.5"/><path d="M9 9L12 22l3-13z"/></g></svg><span>Pin this station</span>';
       pinHint.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -1748,10 +1756,18 @@
 
     var isHome = station.id === homeStationId;
     var isWork = station.id === workStationId;
-    if (isHome) row.appendChild(makeLocRowIcon('home'));
-    if (isWork) row.appendChild(makeLocRowIcon('work'));
-    if (pinInfo && pinInfo.isPinned && !isHome && !isWork) row.appendChild(makeLocRowIcon('pin'));
-    if (watchIds && watchIds.indexOf(station.id) !== -1) row.appendChild(makeNotifyRowIcon());
+
+    var locSlot = document.createElement('span');
+    locSlot.className = 'row-icon-slot';
+    if (isHome) locSlot.appendChild(makeLocRowIcon('home'));
+    else if (isWork) locSlot.appendChild(makeLocRowIcon('work'));
+    else if (pinInfo && pinInfo.isPinned) locSlot.appendChild(makeLocRowIcon('pin'));
+    row.appendChild(locSlot);
+
+    var notifySlot = document.createElement('span');
+    notifySlot.className = 'row-icon-slot';
+    if (watchIds && watchIds.indexOf(station.id) !== -1) notifySlot.appendChild(makeNotifyRowIcon());
+    row.appendChild(notifySlot);
 
     var info = document.createElement('div');
     info.className = 'go-info';
