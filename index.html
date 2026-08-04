@@ -1585,7 +1585,7 @@
     var cls = 'stat-num';
     if (v === '--') cls += ' dim';
     else if (v === 0) cls += ' zero';
-    else cls += ' amber';
+    else if (isFeatured) cls += ' amber';
     num.className = cls;
     num.textContent = v === '--' ? '--' : (v + ' e-bike' + (v === 1 ? '' : 's'));
     name.appendChild(num);
