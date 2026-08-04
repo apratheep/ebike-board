@@ -241,7 +241,14 @@
     flex-shrink: 0;
     color: var(--board-text-dim);
     display: flex;
+    background: none;
+    border: none;
+    padding: 0;
   }
+  #board-root .pin-unpin-btn {
+    cursor: pointer;
+  }
+  #board-root .pin-unpin-btn:active { opacity: 0.55; }
   #board-root .row-icon-slot {
     flex-shrink: 0;
     width: 18px;
@@ -734,8 +741,8 @@
         <span>Nearest | Pinned Stations</span>
         <span class="col-head-icons">
           <button type="button" class="loc-icon-btn" id="set-pin-btn" aria-label="Pin stations" title="Pin stations">
-            <svg class="icon-filled" viewBox="0 0 24 24" width="23" height="23" fill="currentColor"><g transform="rotate(45 12 12)"><rect x="6.5" y="3" width="11" height="6" rx="1.5"/><path d="M9 9L12 22l3-13z"/></g></svg>
-            <svg class="icon-outline" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(45 12 12)"><rect x="6.5" y="3" width="11" height="6" rx="1.5"/><path d="M9 9L12 22l3-13z"/></g></svg>
+            <svg class="icon-filled" viewBox="0 0 264.58 264.58" width="23" height="23" fill="currentColor"><g transform="translate(0.000017 -269.88)"><path d="m109.67 416.98-34.225 34.225a16.421 16.421 0 0 0-2.9352 3.992l-6.27 11.97a0.78314 0.78314 0 0 0 1.0571 1.057l11.97-6.27a16.421 16.421 0 0 0 3.9923-2.9349l34.225-34.225z"/><path d="m147.25 340.33-5.7748 5.7748c-0.39053 0.39053-1.0284 1.0208-1.3776 1.4485-3.1242 3.8268-2.9007 9.4404 0.67046 13.012a0.82944 0.82944 99.39 0 1-0.19986 1.2085l-28.129 23.441c-0.42428 0.35356-1.0835 0.32201-1.4888-0.0531-9.0024-8.3327-22.388-8.7889-30.878-1.0625-0.40842 0.37167-1.0415 1.0057-1.4126 1.4147-0.12136 0.13377 0.09856 0.56033 0.48908 0.95086l68.852 68.852c0.39053 0.39053 1.0452 0.41308 1.4422 0.0292 0.12985-0.12556 0.55175-0.54431 0.92344-0.95274 7.7264-8.4901 7.2702-21.876-1.0625-30.878-0.37513-0.40527-0.40667-1.0645-0.0531-1.4888l23.441-28.129a0.82944 0.82944 170.61 0 1 1.2085-0.19987c4.3127 3.5861 9.4403 3.5861 13.012 0.67046 0.42763-0.34912 1.058-0.98703 1.4485-1.3776l5.7748-5.7748a1 1 90 0 0 0-1.4142l-45.471-45.471a1 1 180 0 0-1.4142 0z"/></g></svg>
+            <svg class="icon-outline" viewBox="0 0 264.58 264.58" width="22" height="22" fill="none" stroke="currentColor" stroke-width="7.9375" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(0.000017 -269.88)"><path d="m109.67 416.98-34.225 34.225a16.421 16.421 0 0 0-2.9352 3.992l-6.27 11.97a0.78314 0.78314 0 0 0 1.0571 1.057l11.97-6.27a16.421 16.421 0 0 0 3.9923-2.9349l34.225-34.225z"/><path d="m147.25 340.33-5.7748 5.7748c-0.39053 0.39053-1.0284 1.0208-1.3776 1.4485-3.1242 3.8268-2.9007 9.4404 0.67046 13.012a0.82944 0.82944 99.39 0 1-0.19986 1.2085l-28.129 23.441c-0.42428 0.35356-1.0835 0.32201-1.4888-0.0531-9.0024-8.3327-22.388-8.7889-30.878-1.0625-0.40842 0.37167-1.0415 1.0057-1.4126 1.4147-0.12136 0.13377 0.09856 0.56033 0.48908 0.95086l68.852 68.852c0.39053 0.39053 1.0452 0.41308 1.4422 0.0292 0.12985-0.12556 0.55175-0.54431 0.92344-0.95274 7.7264-8.4901 7.2702-21.876-1.0625-30.878-0.37513-0.40527-0.40667-1.0645-0.0531-1.4888l23.441-28.129a0.82944 0.82944 170.61 0 1 1.2085-0.19987c4.3127 3.5861 9.4403 3.5861 13.012 0.67046 0.42763-0.34912 1.058-0.98703 1.4485-1.3776l5.7748-5.7748a1 1 90 0 0 0-1.4142l-45.471-45.471a1 1 180 0 0-1.4142 0z"/></g></svg>
             <span class="loc-badge"></span>
           </button>
           <button type="button" class="loc-icon-btn" id="set-home-btn" aria-label="Set home station">
@@ -821,7 +828,7 @@
   var DURATION_OPTIONS = [5, 10, 15, 20];
   var DEFAULT_NOTIFY_DURATION = 15;
   var NEAREST_WATCH_COUNT = 4;
-  var PINNED_MAX = 2;
+  var PINNED_MAX = 8;
   var homeStationId = null;
   var workStationId = null;
   // Ordered list of up to PINNED_MAX station ids the user has pinned to
@@ -956,17 +963,30 @@
   function makeLocRowIcon(type) {
     var span = document.createElement('span');
     span.className = 'row-loc-icon';
-    var label = type === 'home' ? 'Home station' : (type === 'work' ? 'Work station' : 'Pinned station');
+    var label = type === 'home' ? 'Home station' : 'Work station';
     span.setAttribute('aria-label', label);
     span.title = label;
     if (type === 'home') {
       span.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>';
-    } else if (type === 'work') {
-      span.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
     } else {
-      span.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(45 12 12)"><rect x="6.5" y="3" width="11" height="6" rx="1.5"/><path d="M9 9L12 22l3-13z"/></g></svg>';
+      span.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
     }
     return span;
+  }
+
+  function makePinRowButton(station) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'row-loc-icon pin-unpin-btn';
+    btn.setAttribute('aria-label', 'Unpin ' + station.name);
+    btn.title = 'Unpin ' + station.name;
+    btn.innerHTML = '<svg viewBox="0 0 264.58 264.58" width="18" height="18" fill="none" stroke="currentColor" stroke-width="7.9375" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(0.000017 -269.88)"><path d="m109.67 416.98-34.225 34.225a16.421 16.421 0 0 0-2.9352 3.992l-6.27 11.97a0.78314 0.78314 0 0 0 1.0571 1.057l11.97-6.27a16.421 16.421 0 0 0 3.9923-2.9349l34.225-34.225z"/><path d="m147.25 340.33-5.7748 5.7748c-0.39053 0.39053-1.0284 1.0208-1.3776 1.4485-3.1242 3.8268-2.9007 9.4404 0.67046 13.012a0.82944 0.82944 99.39 0 1-0.19986 1.2085l-28.129 23.441c-0.42428 0.35356-1.0835 0.32201-1.4888-0.0531-9.0024-8.3327-22.388-8.7889-30.878-1.0625-0.40842 0.37167-1.0415 1.0057-1.4126 1.4147-0.12136 0.13377 0.09856 0.56033 0.48908 0.95086l68.852 68.852c0.39053 0.39053 1.0452 0.41308 1.4422 0.0292 0.12985-0.12556 0.55175-0.54431 0.92344-0.95274 7.7264-8.4901 7.2702-21.876-1.0625-30.878-0.37513-0.40527-0.40667-1.0645-0.0531-1.4888l23.441-28.129a0.82944 0.82944 170.61 0 1 1.2085-0.19987c4.3127 3.5861 9.4403 3.5861 13.012 0.67046 0.42763-0.34912 1.058-0.98703 1.4485-1.3776l5.7748-5.7748a1 1 90 0 0 0-1.4142l-45.471-45.471a1 1 180 0 0-1.4142 0z"/></g></svg>';
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      togglePin(station.id);
+    });
+    return btn;
   }
 
   function makeNotifyRowIcon() {
@@ -1743,7 +1763,7 @@
       pinHint.type = 'button';
       pinHint.className = 'pin-hint-btn';
       pinHint.setAttribute('aria-label', 'Pin ' + station.name + ' to the top');
-      pinHint.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><g transform="rotate(45 12 12)"><rect x="6.5" y="3" width="11" height="6" rx="1.5"/><path d="M9 9L12 22l3-13z"/></g></svg><span>Pin this station</span>';
+      pinHint.innerHTML = '<svg viewBox="0 0 264.58 264.58" width="12" height="12" fill="currentColor"><g transform="translate(0.000017 -269.88)"><path d="m109.67 416.98-34.225 34.225a16.421 16.421 0 0 0-2.9352 3.992l-6.27 11.97a0.78314 0.78314 0 0 0 1.0571 1.057l11.97-6.27a16.421 16.421 0 0 0 3.9923-2.9349l34.225-34.225z"/><path d="m147.25 340.33-5.7748 5.7748c-0.39053 0.39053-1.0284 1.0208-1.3776 1.4485-3.1242 3.8268-2.9007 9.4404 0.67046 13.012a0.82944 0.82944 99.39 0 1-0.19986 1.2085l-28.129 23.441c-0.42428 0.35356-1.0835 0.32201-1.4888-0.0531-9.0024-8.3327-22.388-8.7889-30.878-1.0625-0.40842 0.37167-1.0415 1.0057-1.4126 1.4147-0.12136 0.13377 0.09856 0.56033 0.48908 0.95086l68.852 68.852c0.39053 0.39053 1.0452 0.41308 1.4422 0.0292 0.12985-0.12556 0.55175-0.54431 0.92344-0.95274 7.7264-8.4901 7.2702-21.876-1.0625-30.878-0.37513-0.40527-0.40667-1.0645-0.0531-1.4888l23.441-28.129a0.82944 0.82944 170.61 0 1 1.2085-0.19987c4.3127 3.5861 9.4403 3.5861 13.012 0.67046 0.42763-0.34912 1.058-0.98703 1.4485-1.3776l5.7748-5.7748a1 1 90 0 0 0-1.4142l-45.471-45.471a1 1 180 0 0-1.4142 0z"/></g></svg><span>Pin this station</span>';
       pinHint.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -1761,8 +1781,12 @@
     locSlot.className = 'row-icon-slot';
     if (isHome) locSlot.appendChild(makeLocRowIcon('home'));
     else if (isWork) locSlot.appendChild(makeLocRowIcon('work'));
-    else if (pinInfo && pinInfo.isPinned) locSlot.appendChild(makeLocRowIcon('pin'));
     row.appendChild(locSlot);
+
+    var pinSlot = document.createElement('span');
+    pinSlot.className = 'row-icon-slot';
+    if (pinInfo && pinInfo.isPinned) pinSlot.appendChild(makePinRowButton(station));
+    row.appendChild(pinSlot);
 
     var notifySlot = document.createElement('span');
     notifySlot.className = 'row-icon-slot';
@@ -1807,14 +1831,19 @@
     var byDistance = sortedByDistance();
     var watchIds = notifyActive() ? byDistance.slice(0, NEAREST_WATCH_COUNT).map(function(s) { return s.id; }) : [];
 
-    // Top rows are pinned stations first (in the order pinned); any open
-    // slot below PINNED_MAX is filled with the next-nearest station so the
-    // top of the list is never empty just because pins aren't set up yet.
+    // Top rows are pinned stations first (in the order pinned), but only the
+    // ones currently within the 8 nearest by distance — pinning doesn't
+    // override real distance, it just highlights a pin when it's already
+    // nearby. Any open slot below 2 is filled with the next-nearest station
+    // so the top of the list is never empty just because pins aren't set up.
+    var nearest8Ids = {};
+    byDistance.slice(0, 8).forEach(function(s) { nearest8Ids[s.id] = true; });
+
     var topRows = [];
     var topIds = {};
     pinnedIds.forEach(function(id) {
       var s = stationsById[id];
-      if (s) { topRows.push({ station: s, isPinned: true }); topIds[s.id] = true; }
+      if (s && nearest8Ids[s.id]) { topRows.push({ station: s, isPinned: true }); topIds[s.id] = true; }
     });
     for (var i = 0; i < byDistance.length && topRows.length < 2; i++) {
       var cand = byDistance[i];
