@@ -53,11 +53,11 @@
   #board-root .mono { font-family: 'Courier New', ui-monospace, Menlo, monospace; }
   #board-root .top-band {
     background: var(--board-green-header);
-    padding: calc(1.1rem + env(safe-area-inset-top)) 1.1rem 1rem;
-    flex: 0 0 25%;
+    padding: calc(1.1rem + env(safe-area-inset-top)) 1.1rem 0.65rem;
+    flex: 0 0 22%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
     gap: 14px;
     overflow: hidden;
   }
@@ -249,7 +249,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    padding: 15px 18px;
+    padding: 15px 24px;
     background: var(--board-panel);
     border: 1px solid transparent;
     border-radius: 12px;
@@ -259,8 +259,8 @@
     border-color: var(--board-amber);
   }
   #board-root .stat-name {
-    font-size: 16px;
-    line-height: 1.18;
+    font-size: 18px;
+    line-height: 1.2;
     color: var(--board-text);
     flex: 1;
     min-width: 0;
@@ -281,13 +281,13 @@
     color: var(--board-text-dim);
   }
   #board-root .stat-num {
-    font-size: 19px;
+    font-size: 21px;
     font-weight: 800;
     white-space: nowrap;
   }
   @media (min-width: 480px) {
-    #board-root .stat-name { font-size: 17px; }
-    #board-root .stat-num { font-size: 20px; }
+    #board-root .stat-name { font-size: 19px; }
+    #board-root .stat-num { font-size: 22px; }
   }
   #board-root .stat-num.amber { color: var(--board-amber); }
   #board-root .stat-num.zero { color: var(--board-red); }
@@ -302,9 +302,9 @@
   #board-root .go-btn {
     background: var(--board-accent);
     color: #ffffff;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 800;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.03em;
     width: 56px;
     height: 56px;
     border-radius: 13px;
@@ -315,7 +315,7 @@
   }
   #board-root .go-btn:active { opacity: 0.8; }
   #board-root .go-walk {
-    font-size: 13px;
+    font-size: 14px;
     white-space: nowrap;
   }
   #board-root .go-walk .go-min {
