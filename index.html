@@ -288,6 +288,20 @@
   #board-root .stat-row-ebike {
     border-color: var(--board-amber);
   }
+  #board-root .stat-row-pin-dock {
+    border-color: var(--board-green);
+  }
+  #board-root .open-dock-pill {
+    flex-shrink: 0;
+    background: var(--board-line);
+    color: var(--board-green);
+    opacity: 0.62;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    padding: 3px 7px;
+    border-radius: 6px;
+  }
   #board-root .stat-name {
     font-size: 18px;
     line-height: 1.2;
@@ -1730,7 +1744,9 @@
 
   function statRow(station, isFeatured, watchIds, pinInfo) {
     var row = document.createElement('div');
-    row.className = 'stat-row' + (isFeatured ? ' stat-row-ebike' : '');
+    var hasOpenDock = typeof station.docks === 'number' && station.docks >= 1;
+    var pinDockClass = (pinInfo && pinInfo.isPinned && hasOpenDock) ? ' stat-row-pin-dock' : '';
+    row.className = 'stat-row' + (isFeatured ? ' stat-row-ebike' : '') + pinDockClass;
 
     var name = document.createElement('div');
     name.className = 'stat-name';
@@ -1788,6 +1804,13 @@
     if (pinInfo && pinInfo.isPinned) pinSlot.appendChild(makePinRowButton(station));
     row.appendChild(pinSlot);
 
+    if (pinDockClass) {
+      var openPill = document.createElement('span');
+      openPill.className = 'open-dock-pill';
+      openPill.textContent = 'OPEN';
+      row.appendChild(openPill);
+    }
+
     var notifySlot = document.createElement('span');
     notifySlot.className = 'row-icon-slot';
     if (watchIds && watchIds.indexOf(station.id) !== -1) notifySlot.appendChild(makeNotifyRowIcon());
@@ -1836,16 +1859,21 @@
     // override real distance, it just highlights a pin when it's already
     // nearby. Any open slot below 2 is filled with the next-nearest station
     // so the top of the list is never empty just because pins aren't set up.
-    var nearest8Ids = {};
-    byDistance.slice(0, 8).forEach(function(s) { nearest8Ids[s.id] = true; });
+    // The top section's size is modular: 3 pinned-or-more unlocks a 3rd row,
+    // otherwise it stays at 2 (unchanged from before pins existed). Pinning
+    // never overrides real distance — a pin only counts if it's already
+    // within the 8 nearest stations — so any open slot below the section's
+    // capacity is filled with the next-nearest station, same as always.
+    var nearest8 = byDistance.slice(0, 8);
+    var sectionCapacity = pinnedIds.length >= 3 ? 3 : 2;
 
     var topRows = [];
     var topIds = {};
-    pinnedIds.forEach(function(id) {
-      var s = stationsById[id];
-      if (s && nearest8Ids[s.id]) { topRows.push({ station: s, isPinned: true }); topIds[s.id] = true; }
+    nearest8.forEach(function(s) {
+      if (topRows.length >= sectionCapacity) return;
+      if (pinnedIds.indexOf(s.id) !== -1) { topRows.push({ station: s, isPinned: true }); topIds[s.id] = true; }
     });
-    for (var i = 0; i < byDistance.length && topRows.length < 2; i++) {
+    for (var i = 0; i < byDistance.length && topRows.length < sectionCapacity; i++) {
       var cand = byDistance[i];
       if (!topIds[cand.id]) { topRows.push({ station: cand, isPinned: false }); topIds[cand.id] = true; }
     }
