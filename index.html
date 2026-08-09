@@ -1859,19 +1859,24 @@
     // override real distance, it just highlights a pin when it's already
     // nearby. Any open slot below 2 is filled with the next-nearest station
     // so the top of the list is never empty just because pins aren't set up.
-    // The top section's size is modular: 3 pinned-or-more unlocks a 3rd row,
-    // otherwise it stays at 2 (unchanged from before pins existed). Pinning
-    // never overrides real distance — a pin only counts if it's already
-    // within the 8 nearest stations — so any open slot below the section's
-    // capacity is filled with the next-nearest station, same as always.
+    // The top section's size is modular: 3 or more QUALIFYING pins (ones
+    // that are actually within the 8 nearest stations right now) unlocks a
+    // 3rd row; otherwise it stays at 2. Pinning never overrides real
+    // distance — a pin only counts once it's genuinely nearby — so having
+    // 3+ pins set somewhere far away still defaults back to a 2-row
+    // section. Qualifying pins are collected in ascending distance order
+    // (nearest8 is already distance-sorted) and always placed first, ahead
+    // of any nearest-fallback rows that fill remaining capacity.
     var nearest8 = byDistance.slice(0, 8);
-    var sectionCapacity = pinnedIds.length >= 3 ? 3 : 2;
+    var qualifyingPinned = nearest8.filter(function(s) { return pinnedIds.indexOf(s.id) !== -1; });
+    var sectionCapacity = qualifyingPinned.length >= 3 ? 3 : 2;
 
     var topRows = [];
     var topIds = {};
-    nearest8.forEach(function(s) {
+    qualifyingPinned.forEach(function(s) {
       if (topRows.length >= sectionCapacity) return;
-      if (pinnedIds.indexOf(s.id) !== -1) { topRows.push({ station: s, isPinned: true }); topIds[s.id] = true; }
+      topRows.push({ station: s, isPinned: true });
+      topIds[s.id] = true;
     });
     for (var i = 0; i < byDistance.length && topRows.length < sectionCapacity; i++) {
       var cand = byDistance[i];
