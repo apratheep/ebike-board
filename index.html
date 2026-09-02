@@ -1917,6 +1917,30 @@
       return typeof s.ebikes === 'number' && s.ebikes > 0 && !topIds[s.id];
     }).slice(0, 5);
 
+    // Fail-safe: a rider should always have a reachable swap option (e-bike
+    // + open dock) rather than only ever seeing "nearest e-bike, walk
+    // there." If none of the 5 above already qualify, swap out the
+    // farthest of the 5 for the single nearest genuinely swap-eligible
+    // station, even if it's farther than that 5th pick would've been. If no
+    // swap-eligible station exists anywhere, the 5 stay exactly as the
+    // normal nearest-with-e-bike ranking — the guarantee just can't be met.
+    var hasSwapInFive = nearestWithEbikes5.some(function(s) {
+      return typeof s.docks === 'number' && s.docks >= 1;
+    });
+    if (!hasSwapInFive) {
+      var fiveIds = {};
+      nearestWithEbikes5.forEach(function(s) { fiveIds[s.id] = true; });
+      var nearestSwap = byDistance.find(function(s) {
+        return typeof s.ebikes === 'number' && s.ebikes > 0 &&
+          typeof s.docks === 'number' && s.docks >= 1 &&
+          !topIds[s.id] && !fiveIds[s.id];
+      });
+      if (nearestSwap) {
+        if (nearestWithEbikes5.length >= 5) nearestWithEbikes5.pop();
+        nearestWithEbikes5.push(nearestSwap);
+      }
+    }
+
     list.innerHTML = '';
 
     if (topRows.length === 0) {
