@@ -32,6 +32,7 @@
     --board-green-header: #e7f2ea;
     --board-green-dark: #1e5b3b;
     --board-red: #ea5a5f;
+    --board-violet: #b18cff;
     --board-text: #eef1f5;
     --board-text-dim: #9aa4b5;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -302,6 +303,21 @@
     padding: 3px 7px;
     border-radius: 6px;
   }
+  #board-root .swap-pill {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: var(--board-line);
+    color: var(--board-violet);
+    opacity: 0.72;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    padding: 3px 7px;
+    border-radius: 6px;
+  }
+  #board-root .swap-pill svg { flex-shrink: 0; }
   #board-root .stat-name {
     font-size: 18px;
     line-height: 1.2;
@@ -1745,6 +1761,7 @@
   function statRow(station, isFeatured, watchIds, pinInfo) {
     var row = document.createElement('div');
     var hasOpenDock = typeof station.docks === 'number' && station.docks >= 1;
+    var hasEbike = typeof station.ebikes === 'number' && station.ebikes > 0;
     var pinDockClass = (pinInfo && pinInfo.isPinned && hasOpenDock) ? ' stat-row-pin-dock' : '';
     row.className = 'stat-row' + (isFeatured ? ' stat-row-ebike' : '') + pinDockClass;
 
@@ -1809,6 +1826,14 @@
       openPill.className = 'open-dock-pill';
       openPill.textContent = 'OPEN';
       row.appendChild(openPill);
+    }
+
+    if (hasEbike && hasOpenDock) {
+      var swapPill = document.createElement('span');
+      swapPill.className = 'swap-pill';
+      swapPill.title = 'Swap your bike for an e-bike here';
+      swapPill.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h11l-3-3"/><path d="M7 7l3 3"/><path d="M17 17H6l3-3"/><path d="M17 17l-3 3"/></svg><span>SWAP</span>';
+      row.appendChild(swapPill);
     }
 
     var notifySlot = document.createElement('span');
