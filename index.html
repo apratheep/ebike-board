@@ -1461,6 +1461,15 @@
     return R * c;
   }
 
+  // Simple quadrant (not a precise compass bearing) of a station relative
+  // to the rider's current position — plenty accurate at walking/riding
+  // distances, and matches the NE/NW/SE/SW framing riders think in.
+  function quadrantFrom(fromLoc, station) {
+    var ns = station.lat >= fromLoc.lat ? 'N' : 'S';
+    var ew = station.lon >= fromLoc.lon ? 'E' : 'W';
+    return ns + ew;
+  }
+
   function saveLocation() {
     try { localStorage.setItem(LOC_KEY, JSON.stringify(userLoc)); } catch (e) {}
   }
@@ -1829,10 +1838,12 @@
     }
 
     if (hasEbike && hasOpenDock) {
+      var swapQuad = userLoc ? quadrantFrom(userLoc, station) : null;
+      var swapRot = { NE: 45, SE: 135, SW: 225, NW: 315 }[swapQuad] || 45;
       var swapPill = document.createElement('span');
       swapPill.className = 'swap-pill';
-      swapPill.title = 'Swap your bike for an e-bike here';
-      swapPill.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h11l-3-3"/><path d="M7 7l3 3"/><path d="M17 17H6l3-3"/><path d="M17 17l-3 3"/></svg><span>SWAP</span>';
+      swapPill.title = 'Swap your bike for an e-bike here' + (swapQuad ? ' (' + swapQuad + ' of you)' : '');
+      swapPill.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + swapRot + 'deg)"><path d="M12 20V4"/><path d="M6 10l6-6 6 6"/></svg><span>' + (swapQuad || 'SWAP') + '</span>';
       row.appendChild(swapPill);
     }
 
@@ -1920,24 +1931,41 @@
     // Fail-safe: a rider should always have a reachable swap option (e-bike
     // + open dock) rather than only ever seeing "nearest e-bike, walk
     // there." If none of the 5 above already qualify, swap out the
-    // farthest of the 5 for the single nearest genuinely swap-eligible
-    // station, even if it's farther than that 5th pick would've been. If no
-    // swap-eligible station exists anywhere, the 5 stay exactly as the
-    // normal nearest-with-e-bike ranking — the guarantee just can't be met.
+    // farthest TWO of the 5 for two genuinely swap-eligible stations —
+    // the single nearest one, plus the nearest one on the OPPOSITE side of
+    // it (East vs. West), so the two options cover different directions
+    // rather than clustering on one side. Degrades gracefully: if only one
+    // swap-eligible station exists anywhere (no opposite-side match), just
+    // that one replaces the farthest slot. If none exist at all, the 5
+    // stay exactly as the normal nearest-with-e-bike ranking.
     var hasSwapInFive = nearestWithEbikes5.some(function(s) {
       return typeof s.docks === 'number' && s.docks >= 1;
     });
-    if (!hasSwapInFive) {
+    if (!hasSwapInFive && userLoc) {
       var fiveIds = {};
       nearestWithEbikes5.forEach(function(s) { fiveIds[s.id] = true; });
-      var nearestSwap = byDistance.find(function(s) {
+
+      var isSwapEligible = function(s) {
         return typeof s.ebikes === 'number' && s.ebikes > 0 &&
           typeof s.docks === 'number' && s.docks >= 1 &&
           !topIds[s.id] && !fiveIds[s.id];
-      });
-      if (nearestSwap) {
+      };
+
+      var swap1 = byDistance.find(isSwapEligible);
+      var swap2 = null;
+      if (swap1) {
+        var ew1 = quadrantFrom(userLoc, swap1)[1]; // 'E' or 'W'
+        swap2 = byDistance.find(function(s) {
+          return s.id !== swap1.id && isSwapEligible(s) && quadrantFrom(userLoc, s)[1] !== ew1;
+        });
+      }
+
+      if (swap1 && swap2) {
+        nearestWithEbikes5 = nearestWithEbikes5.slice(0, Math.max(0, nearestWithEbikes5.length - 2));
+        nearestWithEbikes5.push(swap1, swap2);
+      } else if (swap1) {
         if (nearestWithEbikes5.length >= 5) nearestWithEbikes5.pop();
-        nearestWithEbikes5.push(nearestSwap);
+        nearestWithEbikes5.push(swap1);
       }
     }
 
