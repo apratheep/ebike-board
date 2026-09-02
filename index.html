@@ -296,7 +296,7 @@
     flex-shrink: 0;
     background: var(--board-line);
     color: var(--board-green);
-    opacity: 0.62;
+    opacity: 0.8;
     font-size: 10px;
     font-weight: 500;
     letter-spacing: 0.02em;
@@ -310,7 +310,7 @@
     gap: 3px;
     background: var(--board-line);
     color: var(--board-violet);
-    opacity: 0.72;
+    opacity: 0.9;
     font-size: 10px;
     font-weight: 500;
     letter-spacing: 0.02em;
@@ -1839,11 +1839,10 @@
 
     if (hasEbike && hasOpenDock) {
       var swapQuad = userLoc ? quadrantFrom(userLoc, station) : null;
-      var swapRot = { NE: 45, SE: 135, SW: 225, NW: 315 }[swapQuad] || 45;
       var swapPill = document.createElement('span');
       swapPill.className = 'swap-pill';
       swapPill.title = 'Swap your bike for an e-bike here' + (swapQuad ? ' (' + swapQuad + ' of you)' : '');
-      swapPill.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + swapRot + 'deg)"><path d="M12 20V4"/><path d="M6 10l6-6 6 6"/></svg><span>' + (swapQuad || 'SWAP') + '</span>';
+      swapPill.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h11l-3-3"/><path d="M7 7l3 3"/><path d="M17 17H6l3-3"/><path d="M17 17l-3 3"/></svg><span>' + (swapQuad || 'SWAP') + '</span>';
       row.appendChild(swapPill);
     }
 
