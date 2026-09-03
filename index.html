@@ -385,6 +385,9 @@
   #board-root .go-walk .go-dist {
     color: var(--board-text-dim);
   }
+  #board-root .go-walk .go-dir {
+    color: var(--board-text-dim);
+  }
   #board-root .empty {
     text-align: center;
     padding: 24px 8px;
@@ -1838,11 +1841,10 @@
     }
 
     if (hasEbike && hasOpenDock) {
-      var swapQuad = userLoc ? quadrantFrom(userLoc, station) : null;
       var swapPill = document.createElement('span');
       swapPill.className = 'swap-pill';
-      swapPill.title = 'Swap your bike for an e-bike here' + (swapQuad ? ' (' + swapQuad + ' of you)' : '');
-      swapPill.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h11l-3-3"/><path d="M7 7l3 3"/><path d="M17 17H6l3-3"/><path d="M17 17l-3 3"/></svg><span>' + (swapQuad || 'SWAP') + '</span>';
+      swapPill.title = 'Swap your bike for an e-bike here';
+      swapPill.textContent = 'SWAP';
       row.appendChild(swapPill);
     }
 
@@ -1866,9 +1868,10 @@
     if (userLoc && typeof station.lat === 'number' && typeof station.lon === 'number') {
       var distKm = distanceKm(userLoc.lat, userLoc.lon, station.lat, station.lon);
       var mins = Math.max(1, Math.round((distKm * 1000) / WALK_METERS_PER_MIN));
+      var rowQuad = quadrantFrom(userLoc, station);
       var walk = document.createElement('div');
       walk.className = 'go-walk';
-      walk.innerHTML = '<span class="go-min">' + mins + ' min</span><span class="go-dist"> · ' + formatDistance(distKm) + '</span>';
+      walk.innerHTML = '<span class="go-min">' + mins + ' min</span><span class="go-dist"> · ' + formatDistance(distKm) + '</span><span class="go-dir"> · ' + rowQuad + '</span>';
       info.appendChild(walk);
     }
 
