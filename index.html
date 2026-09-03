@@ -326,10 +326,6 @@
     background: var(--board-panel);
     padding: 0 2px;
   }
-  #board-root .stat-row-ebike .swap-pill .swap-arrow,
-  #board-root .stat-row-pin-dock .swap-pill .swap-arrow {
-    background: var(--board-panel);
-  }
   #board-root .swap-pill .swap-arrow-top {
     top: -6px;
     right: 8px;
@@ -1864,7 +1860,7 @@
       var swapPill = document.createElement('span');
       swapPill.className = 'swap-pill';
       swapPill.title = 'Swap your bike for an e-bike here';
-      swapPill.textContent = 'SWAP';
+      swapPill.innerHTML = '<span class="swap-arrow swap-arrow-top">▶</span><span class="swap-arrow swap-arrow-bottom">◀</span><span>E-SWAP</span>';
       row.appendChild(swapPill);
     }
 
