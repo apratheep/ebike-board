@@ -292,17 +292,6 @@
   #board-root .stat-row-pin-dock {
     border-color: var(--board-green);
   }
-  #board-root .open-dock-pill {
-    flex-shrink: 0;
-    background: var(--board-line);
-    color: var(--board-green);
-    opacity: 0.8;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    padding: 3px 7px;
-    border-radius: 6px;
-  }
   #board-root .swap-pill {
     position: relative;
     flex-shrink: 0;
@@ -310,7 +299,8 @@
     align-items: center;
     justify-content: center;
     background: none;
-    border: 1.4px solid var(--board-violet);
+    border: none;
+    box-shadow: inset 0 0 0 1.2px var(--board-violet);
     border-radius: 6px;
     color: var(--board-violet);
     font-size: 10px;
@@ -321,17 +311,17 @@
   #board-root .swap-pill .swap-arrow {
     position: absolute;
     color: var(--board-violet);
-    font-size: 9px;
+    font-size: 7px;
     line-height: 1;
     background: var(--board-panel);
     padding: 0 2px;
   }
   #board-root .swap-pill .swap-arrow-top {
-    top: -6px;
+    top: -4px;
     right: 8px;
   }
   #board-root .swap-pill .swap-arrow-bottom {
-    bottom: -6px;
+    bottom: -4px;
     left: 8px;
   }
   #board-root .stat-name {
@@ -394,15 +384,12 @@
     font-size: 14px;
     white-space: nowrap;
   }
-  #board-root .go-walk .go-min {
-    color: var(--board-text);
-    font-weight: 600;
-  }
   #board-root .go-walk .go-dist {
     color: var(--board-text-dim);
   }
   #board-root .go-walk .go-dir {
-    color: var(--board-text-dim);
+    color: var(--board-text);
+    font-weight: 600;
   }
   #board-root .empty {
     text-align: center;
@@ -1780,8 +1767,6 @@
       '&q=' + encodeURIComponent(station.name);
   }
 
-  var WALK_METERS_PER_MIN = 83.33; // ~5 km/h, the standard pace Google/Apple Maps use for walking estimates
-
   function formatDistance(distKm) {
     return distKm < 1 ? Math.round(distKm * 1000) + ' m' : distKm.toFixed(1) + ' km';
   }
@@ -1849,13 +1834,6 @@
     if (pinInfo && pinInfo.isPinned) pinSlot.appendChild(makePinRowButton(station));
     row.appendChild(pinSlot);
 
-    if (pinDockClass) {
-      var openPill = document.createElement('span');
-      openPill.className = 'open-dock-pill';
-      openPill.textContent = 'OPEN';
-      row.appendChild(openPill);
-    }
-
     if (hasEbike && hasOpenDock) {
       var swapPill = document.createElement('span');
       swapPill.className = 'swap-pill';
@@ -1883,11 +1861,10 @@
 
     if (userLoc && typeof station.lat === 'number' && typeof station.lon === 'number') {
       var distKm = distanceKm(userLoc.lat, userLoc.lon, station.lat, station.lon);
-      var mins = Math.max(1, Math.round((distKm * 1000) / WALK_METERS_PER_MIN));
       var rowQuad = quadrantFrom(userLoc, station);
       var walk = document.createElement('div');
       walk.className = 'go-walk';
-      walk.innerHTML = '<span class="go-min">' + mins + ' min</span><span class="go-dist"> · ' + formatDistance(distKm) + '</span><span class="go-dir"> · ' + rowQuad + '</span>';
+      walk.innerHTML = '<span class="go-dist">' + formatDistance(distKm) + '</span><span class="go-dir"> · ' + rowQuad + '</span>';
       info.appendChild(walk);
     }
 
