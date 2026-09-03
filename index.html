@@ -1834,7 +1834,7 @@
     if (pinInfo && pinInfo.isPinned) pinSlot.appendChild(makePinRowButton(station));
     row.appendChild(pinSlot);
 
-    if (hasEbike && hasOpenDock) {
+    if (isFeatured && hasEbike && hasOpenDock) {
       var swapPill = document.createElement('span');
       swapPill.className = 'swap-pill';
       swapPill.title = 'Swap your bike for an e-bike here';
